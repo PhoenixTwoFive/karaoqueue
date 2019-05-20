@@ -10,7 +10,3 @@ def get_catalog_url():
 def get_songs(url):
     r = requests.get(url)
     return r.text
-
-
-if __name__ == "__main__":
-    print(get_songs)
