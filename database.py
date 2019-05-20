@@ -1,0 +1,39 @@
+import sqlite3
+import pandas
+from io import StringIO
+
+song_table  = "songs"
+entry_table = "entries"
+index_label = "Id"
+
+def open_db():
+    conn = sqlite3.connect("test.db")
+    return conn
+
+def import_songs(song_csv):
+    df = pandas.read_csv(StringIO(song_csv), sep=';')
+    conn = open_db()
+    df.to_sql(song_table, conn, if_exists='replace',
+              index=False)
+    conn.close()
+    return
+
+def create_entry_table():
+    conn = open_db()
+    t = (entry_table,)
+    conn.execute('CREATE TABLE IF NOT EXISTS '+entry_table +
+                 ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255))')
+
+def create_list_view():
+    conn = open_db()
+    conn.execute("""CREATE VIEW IF NOT EXISTS [Liste] AS
+                 SELECT Name, Title, Artist
+                 FROM entries, songs
+                 WHERE entries.Song_Id=songs.Id""")
+
+def get_list():
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM Liste")
+    return cur.fetchall()
+
