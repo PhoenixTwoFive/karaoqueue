@@ -23,6 +23,7 @@ def create_entry_table():
     t = (entry_table,)
     conn.execute('CREATE TABLE IF NOT EXISTS '+entry_table +
                  ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255))')
+    conn.close()
 
 def create_list_view():
     conn = open_db()
@@ -30,6 +31,7 @@ def create_list_view():
                  SELECT Name, Title, Artist
                  FROM entries, songs
                  WHERE entries.Song_Id=songs.Id""")
+    conn.close()
 
 def get_list():
     conn = open_db()
@@ -37,3 +39,23 @@ def get_list():
     cur.execute("SELECT * FROM Liste")
     return cur.fetchall()
 
+def get_song_list():
+    conn =open_db()
+    cur = conn.cursor()
+    cur.execute("SELECT Title || \" - \" || Artist AS Song, Id FROM songs")
+    return cur.fetchall()
+
+def get_song_completions(input_string):
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute("SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE Song LIKE '%"+input_string+"%'")
+    return cur.fetchall()
+
+def add_entry(name,song_id):
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO entries (Song_Id,Name) VALUES(?,?);", (song_id,name))
+    conn.commit()
+    conn.close()
+    return

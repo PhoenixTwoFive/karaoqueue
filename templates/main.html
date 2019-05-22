@@ -1,0 +1,26 @@
+
+
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<table class="table">
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Song</th>
+        <th scope="col">Künstler</th>
+    </tr>
+    {% for entry in list: %}
+    <tr>
+        <td>
+            {{ entry[0] }}
+        </td>
+        <td>
+            {{ entry[1] }}
+        </td>
+        <td>
+            {{ entry[2] }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

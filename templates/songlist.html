@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Songliste{% endblock %}
+{% block content %}
+<input class="form-control" id="filter" type="text" placeholder="Suchen...">
+<table class="table">
+    <tbody id="songtable">
+        <!--{% for entry in (): %}
+        <tr>
+            <td>
+                {{ entry[0] }} 
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary"><i class="material-icons">queue_music</i></button>
+            </td>
+        </tr>
+        {% endfor %}-->
+    </tbody>
+</table>
+<div class="modal fade" id="enqueueModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Auf Liste setzen</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="form-group">
+            <form id="nameForm">
+                <div class="modal-body">
+                        <label for="singerNameInput">Sängername</label>
+                        <input type="text" class="form-control" id="singerNameInput" placeholder="Max Mustermann"
+                            required>
+                        <input id="selectedId" name="selectedId" type="hidden" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submitSongButton">Anmelden</button>
+                    </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script>
+    $(document).ready(function () {
+        $("#filter").keyup( function () {
+            var value = $(this).val().toLowerCase();
+            //alert(value);
+            if(value.length >= 3) {
+                $.getJSON("/api/songs/compl/" + value, function (data) {
+                    var items = [];
+                    $.each(data, function (key, val) {
+                        items.push("<tr><td>"+val[0]+`</td>
+                            <td><button type='button' class='btn btn-primary' data-toggle='modal'
+                                    data-target='#enqueueModal' onclick='setSelectedId(`+val[1]+`)'><i
+                                        class='material-icons'>queue_music</i></button></td>
+                        </tr>`)
+                    });
+    
+                    $("#songtable").html("")
+                    $(items.join("")).appendTo("#songtable");
+                });
+            }
+        });
+
+        $("#nameForm").submit( function (e) {
+            e.preventDefault();
+            submitModal();
+        });
+    });
+
+    
+    function enqueue(id,name) {
+        var data = {
+            "name": name,
+            "id": id
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/api/enqueue',
+            data: JSON.stringify(data), // or JSON.stringify ({name: 'jonas'}),
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+    
+    function setSelectedId(id) {
+        $("#selectedId").attr("value",id);
+    }
+    
+    function submitModal() {
+        var name = $("#singerNameInput").val();
+        var id = $("#selectedId").attr("value");
+        enqueue(id,name);
+        $("#enqueueModal").modal('hide');
+
+    }
+</script>
+{% endblock %}
