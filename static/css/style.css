@@ -1,3 +1,30 @@
 body {
     padding-top: 5rem;
 }
+
+html, body {
+    height: 100%;
+}
+
+footer a, footer span{
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.site {
+    height: auto;
+    min-height: 100%;
+}
+
+main {
+    padding-bottom: 60px; /* Höhe des Footers */
+}
+
+.footer {
+    margin-top: -60px;
+    width: 100%;
+    height: 60px;
+    /* Set the fixed height of the footer here */
+    /*line-height: 60px; /* Vertically center the text there */
+    background-color: #f5f5f5;
+}

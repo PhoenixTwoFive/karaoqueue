@@ -45,11 +45,24 @@
             </form>-->
         </div>
     </nav>
-
-    <main role="main" class="container">
-        {% block content %}{% endblock %}
-    </main><!-- /.container -->
-
+    <div class="site">
+        <main role="main" class="container">
+            {% block content %}{% endblock %}
+        </main><!-- /.container -->
+    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center py-3">
+            {% if not auth %}
+                <a href="/login"><i class='material-icons'>launch</i>&nbsp;Login</a>
+            {% endif %}
+            <a href="https://github.com/PhoenixTwoFive/karaoqueue"><i class='material-icons'>code</i>&nbsp;Github</a>
+            <span class="text-muted">KaraoQueue -&nbsp;<span
+                    style="display:inline-block;transform: rotate(180deg);">&copy</span>&nbsp;2019 - Phillip
+                Kühne</span>
+        </div>
+    </footer>
+    <!-- Footer -->
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

@@ -1,0 +1,45 @@
+
+
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<table class="table">
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Song</th>
+        <th scope="col">Künstler</th>
+        <th scope="col">Löschen</th>
+    </tr>
+    {% for entry in list: %}
+    <tr>
+        <td>
+            {{ entry[0] }}
+        </td>
+        <td>
+            {{ entry[1] }}
+        </td>
+        <td>
+            {{ entry[2] }}
+        </td>
+        <td>
+            <button type='button' class='btn btn-danger' onclick='deleteEntry({{ entry[3] }})'><i
+                    class='material-icons'>delete</i></button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<a name="end"></a>
+{% endblock %}
+{% block extrajs %}
+<script>
+    function deleteEntry(entry_id) {
+       $.ajax({
+        type: 'GET',
+        url: '/api/entries/delete/'+entry_id,
+        contentType: "application/json",
+        dataType: 'json'
+       });
+       location.reload();
+    }
+</script>
+{% endblock %}

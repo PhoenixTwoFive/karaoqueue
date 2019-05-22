@@ -28,7 +28,7 @@ def create_entry_table():
 def create_list_view():
     conn = open_db()
     conn.execute("""CREATE VIEW IF NOT EXISTS [Liste] AS
-                 SELECT Name, Title, Artist
+                 SELECT Name, Title, Artist, entries.Id
                  FROM entries, songs
                  WHERE entries.Song_Id=songs.Id""")
     conn.close()
@@ -59,3 +59,11 @@ def add_entry(name,song_id):
     conn.commit()
     conn.close()
     return
+
+def delete_entry(id):
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM entries WHERE id=?",(id,))
+    conn.commit()
+    conn.close()
+    return True
