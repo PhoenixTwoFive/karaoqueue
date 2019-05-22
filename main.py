@@ -55,7 +55,7 @@ def delete_entry(entry_id):
 @app.route("/login")
 @basic_auth.required
 def admin():
-    return redirect("/")
+    return redirect("/", code=303)
 
 if __name__ == "__main__":
     """try:
