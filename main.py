@@ -48,9 +48,9 @@ def get_song_completions(input_string):
 @basic_auth.required
 def delete_entry(entry_id):
     if database.delete_entry(entry_id):
-        return Response({"status": "OK"}, mimetype='text/json')
+        return Response('{"status": "OK"}', mimetype='text/json')
     else:
-        return Response({"status": "FAIL"}, mimetype='text/json')
+        return Response('{"status": "FAIL"}', mimetype='text/json')
 
 @app.route("/login")
 @basic_auth.required
