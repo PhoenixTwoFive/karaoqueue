@@ -74,7 +74,7 @@
     });
 
     
-    function enqueue(id,name) {
+    function enqueue(id,name,success_callback) {
         var data = {
             "name": name,
             "id": id
@@ -83,6 +83,7 @@
             type: 'POST',
             url: '/api/enqueue',
             data: JSON.stringify(data), // or JSON.stringify ({name: 'jonas'}),
+            success: success_callback,
             contentType: "application/json",
             dataType: 'json'
         });
@@ -95,8 +96,11 @@
     function submitModal() {
         var name = $("#singerNameInput").val();
         var id = $("#selectedId").attr("value");
-        enqueue(id,name);
-        $("#enqueueModal").modal('hide');
+        enqueue(id,name,function(){
+            $("#enqueueModal").modal('hide');
+            window.location.href = '/#end';
+        });
+        
 
     }
 </script>

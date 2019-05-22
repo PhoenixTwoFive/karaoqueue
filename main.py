@@ -16,7 +16,7 @@ def enqueue():
     name = request.json['name']
     song_id = request.json['id']
     database.add_entry(name,song_id)
-    return "OK"
+    return Response('{"status":"OK"}', mimetype='text/json')
 
 @app.route("/list")
 def songlist():
