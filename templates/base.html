@@ -52,11 +52,14 @@
     </div>
     <!-- Footer -->
     <footer class="footer">
-        <div class="container text-center py-3">
+        <div class="container text-center py-3 d-flex flex-row mx-auto">
             {% if not auth %}
-                <a href="/login"><i class='material-icons'>launch</i>&nbsp;Login</a>
+                <a href="/login" class="d-flex justify-content-center align-content-between ml-1 mr-1"><i
+                        class='material-icons mr-1'>launch</i><span>Login</span></a>
             {% endif %}
-            <a href="https://github.com/PhoenixTwoFive/karaoqueue"><i class='material-icons'>code</i>&nbsp;Github</a>
+            <a href="https://github.com/PhoenixTwoFive/karaoqueue"
+                class="d-flex justify-content-center align-content-between ml-1 mr-1"><i
+                    class='material-icons mr-1'>code</i><span>Github</span></a>
             <span class="text-muted">KaraoQueue -&nbsp;<span
                     style="display:inline-block;transform: rotate(180deg);">&copy</span>&nbsp;2019 - Phillip
                 Kühne</span>

@@ -1,3 +1,5 @@
+# -*- coding: utf_8 -*-
+
 import sqlite3
 import pandas
 from io import StringIO
@@ -8,6 +10,7 @@ index_label = "Id"
 
 def open_db():
     conn = sqlite3.connect("test.db")
+    conn.execute('PRAGMA encoding = "UTF-8";')
     return conn
 
 def import_songs(song_csv):
@@ -16,6 +19,7 @@ def import_songs(song_csv):
     df.to_sql(song_table, conn, if_exists='replace',
               index=False)
     conn.close()
+    print("Imported songs")
     return
 
 def create_entry_table():
@@ -23,6 +27,22 @@ def create_entry_table():
     t = (entry_table,)
     conn.execute('CREATE TABLE IF NOT EXISTS '+entry_table +
                  ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255))')
+    conn.close()
+
+def create_song_table():
+    conn = open_db()
+    t = (entry_table,)
+    conn.execute("CREATE TABLE IF NOT EXISTS \""+song_table+"""\" (
+        "Id" INTEGER,
+        "Title" TEXT,
+        "Artist" TEXT,
+        "Year" INTEGER,
+        "Duo" INTEGER,
+        "Explicit" INTEGER,
+        "Date Added" TEXT,
+        "Styles" TEXT,
+        "Languages" TEXT
+    )""")
     conn.close()
 
 def create_list_view():
@@ -48,7 +68,9 @@ def get_song_list():
 def get_song_completions(input_string):
     conn = open_db()
     cur = conn.cursor()
-    cur.execute("SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE Song LIKE '%"+input_string+"%'")
+    # Don't look, it burns...
+    cur.execute(
+        "SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE Song LIKE REPLACE(REPLACE(REPLACE(REPLACE(UPPER('%"+input_string+"%'),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ')")
     return cur.fetchall()
 
 def add_entry(name,song_id):
@@ -64,6 +86,15 @@ def delete_entry(id):
     conn = open_db()
     cur = conn.cursor()
     cur.execute("DELETE FROM entries WHERE id=?",(id,))
+    conn.commit()
+    conn.close()
+    return True
+
+
+def delete_all_entries():
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM entries")
     conn.commit()
     conn.close()
     return True

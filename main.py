@@ -37,11 +37,23 @@ def songs():
     list = database.get_song_list()
     return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
+@app.route("/api/songs/update")
+def update_songs():
+    database.delete_all_entries()
+    database.import_songs(helpers.get_songs(helpers.get_catalog_url()))
+    return Response('{"status":"OK"}', mimetype='text/json')
 
-@app.route("/api/songs/compl/<input_string>")
-def get_song_completions(input_string):
-    list = database.get_song_completions(input_string=input_string)
-    return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
+
+@app.route("/api/songs/compl")
+def get_song_completions(input_string=""):
+    input_string = request.args.get('search',input_string)
+    if input_string!="":
+        print(input_string)
+        list = database.get_song_completions(input_string=input_string)
+        return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
+
+    else:
+        return 400
 
 
 @app.route("/api/entries/delete/<entry_id>")
@@ -52,19 +64,24 @@ def delete_entry(entry_id):
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
 
+@app.route("/api/entries/delete_all")
+@basic_auth.required
+def delete_all_entries():
+    if database.delete_all_entries():
+        return Response('{"status": "OK"}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json')
+
 @app.route("/login")
 @basic_auth.required
 def admin():
     return redirect("/", code=303)
 
-if __name__ == "__main__":
-    """try:
-        os.remove("test.db")
-        print("removed database")
-    except OSError:
-        print("failed to remove database")
-        pass"""
+@app.before_first_request
+def activate_job():
     database.create_entry_table()
+    database.create_song_table()
     database.create_list_view()
-    database.import_songs(helpers.get_songs(helpers.get_catalog_url()))
+
+if __name__ == "__main__":    
     app.run(debug=True, host='0.0.0.0')

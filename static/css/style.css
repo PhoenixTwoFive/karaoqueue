@@ -6,11 +6,6 @@ html, body {
     height: 100%;
 }
 
-footer a, footer span{
-    display: inline-flex;
-    vertical-align: middle;
-}
-
 .site {
     height: auto;
     min-height: 100%;

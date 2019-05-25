@@ -51,11 +51,13 @@
             var value = $(this).val().toLowerCase();
             //alert(value);
             if(value.length >= 3) {
-                $.getJSON("/api/songs/compl/" + value, function (data) {
+                $.getJSON("/api/songs/compl", { search: value }, function (data) {
                     var items = [];
                     $.each(data, function (key, val) {
                         items.push("<tr><td>"+val[0]+`</td>
-                            <td><button type='button' class='btn btn-primary' data-toggle='modal'
+                            <td><button type='button'
+                                    class='btn btn-primary d-flex justify-content-center align-content-between'
+                                    data-toggle='modal'
                                     data-target='#enqueueModal' onclick='setSelectedId(`+val[1]+`)'><i
                                         class='material-icons'>queue_music</i></button></td>
                         </tr>`)
