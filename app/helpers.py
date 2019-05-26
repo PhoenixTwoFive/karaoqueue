@@ -25,7 +25,7 @@ def setup_config(app):
             config = json.load(handle)
         print("Loaded existing config")
     else:
-        config = {'username': 'admin', 'password': 'Karaoke2019blubb'}
+        config = {'username': 'admin', 'password': 'changeme'}
         with open(config_file, 'w') as handle:
             json.dump(config, handle, indent=4, sort_keys=True)
         print("Wrote new config")
