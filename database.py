@@ -14,13 +14,17 @@ def open_db():
     return conn
 
 def import_songs(song_csv):
+    print("Start importing Songs...")
     df = pandas.read_csv(StringIO(song_csv), sep=';')
     conn = open_db()
+    cur = conn.cursor()
     df.to_sql(song_table, conn, if_exists='replace',
               index=False)
+    cur.execute("SELECT Count(Id) FROM songs")
+    num_songs = cur.fetchone()[0]
     conn.close()
-    print("Imported songs")
-    return
+    print("Imported songs ({} in Database)".format(num_songs))
+    return("Imported songs ({} in Database)".format(num_songs)) 
 
 def create_entry_table():
     conn = open_db()

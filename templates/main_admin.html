@@ -7,16 +7,11 @@
     <div class="row">
         <div class="card" style="width: 100%">
             <div class="card-body d-flex flex-row">
-                <button type="button" class="btn btn-danger d-flex justify-content-center align-content-between m-2"
-                    onclick="confirmDeleteAllEntries()"><i
-                        class="material-icons mr-1">
-                        delete_forever
-                    </i>&nbsp;Alle Einträge löschen</button>
-                <button type="button" class="btn btn-danger d-flex justify-content-center align-content-between m-2"
-                    onclick="confirmUpdateSongDatabase()"><i
-                        class="material-icons mr-1">
-                        cloud_download
-                    </i>&nbsp;Song-Datenbank aktualisieren</button>
+                <button type="button" class="btn btn-danger m-2"
+                    onclick="confirmDeleteAllEntries()"><i class="fas fa-trash mr-2"></i>Alle Einträge löschen</button>
+                <button type="button" class="btn btn-danger m-2"
+                    onclick="confirmUpdateSongDatabase()"><i class="fas fa-file-import mr-2"></i>Song-Datenbank
+                    aktualisieren</button>
             </div>
         </div>
     </div>
@@ -40,9 +35,9 @@
                     {{ entry[2] }}
                 </td>
                 <td>
-                    <button type='button' class='btn btn-danger d-flex justify-content-center align-content-between'
+                    <button type='button' class='btn btn-danger justify-content-center align-content-between'
                         onclick='confirmDeleteEntry("{{ entry[0] }}",{{ entry[3] }})'><i
-                            class='material-icons'>delete</i></button>
+                            class="fas fa-trash"></i></button>
                 </td>
             </tr>
             {% endfor %}
@@ -63,17 +58,47 @@
         })
     }
     function confirmDeleteAllEntries() {
-        bootbox.confirm("Wirklich alle Eintragungen löschen?", function(result){
-            if (result) {
-                deleteAllEntries()
+        bootbox.confirm({
+            message: "Wirklich alle Eintragungen löschen?", 
+            buttons: {
+                confirm: {
+                    label: 'Ja',
+                    className: 'btn btn-danger'
+                },
+                cancel: {
+                    label: 'Nein',
+                    className: 'btn btn-secondary'
+                }
+            },
+            callback: function(result){
+                if (result) {
+                    deleteAllEntries()
+                }
             }
         })
     }
     function confirmUpdateSongDatabase() {
-        bootbox.confirm("Wirklich die Song-Datenbank aktualisieren?<br>Dies lädt die Aktuelle Song-Liste von <a href='https://www.karafun.de/karaoke-song-list.html'>KaraFun</a> herunter, <b>und wird alle Eintragungen löschen!</b>" ,
-        function(result){
-            if (result) {
-                updateSongDatabase()
+        bootbox.confirm({
+            message: "Wirklich die Song-Datenbank aktualisieren?<br>Dies lädt die Aktuelle Song-Liste von <a href='https://www.karafun.de/karaoke-song-list.html'>KaraFun</a> herunter, <b>und wird alle Eintragungen löschen!</b>",
+            buttons: {
+                confirm: {
+                    label: 'Ja',
+                    className: 'btn-primary'
+                },
+                cancel: {
+                    label: 'Nein',
+                    className: 'btn btn-secondary'
+                }
+            },
+            callback: function(result){
+                if (result) {
+                    var dialog = bootbox.dialog({
+                        message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Aktualisiere Song-Datenbank...</p>',
+    
+                        closeButton: false
+                    });
+                    updateSongDatabase(dialog)                    
+                }
             }
         })
     }
@@ -95,14 +120,20 @@
         });
         location.reload();
     }
-    function updateSongDatabase() {
+    function updateSongDatabase(wait_dialog) {
         $.ajax({
             type: 'GET',
             url: '/api/songs/update',
             contentType: "application/json",
-            dataType: 'json'
+            dataType: 'json',
+            success: function(data) {
+                wait_dialog.modal('hide')
+                bootbox.alert({
+                    message: data["status"],
+                    callback: function() {location.reload()}
+                })
+            }
         });
-        location.reload();
     }
 </script>
 {% endblock %}

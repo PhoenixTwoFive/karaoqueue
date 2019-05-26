@@ -56,16 +56,18 @@
                     $.each(data, function (key, val) {
                         items.push("<tr><td>"+val[0]+`</td>
                             <td><button type='button'
-                                    class='btn btn-primary d-flex justify-content-center align-content-between'
+                                    class='btn btn-primary justify-content-center align-content-between'
                                     data-toggle='modal'
                                     data-target='#enqueueModal' onclick='setSelectedId(`+val[1]+`)'><i
-                                        class='material-icons'>queue_music</i></button></td>
+                                        class="fas fa-plus"></i></button></td>
                         </tr>`)
                     });
     
                     $("#songtable").html("")
                     $(items.join("")).appendTo("#songtable");
                 });
+            } else {
+                $("#songtable").html("")
             }
         });
 
