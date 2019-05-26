@@ -6,9 +6,6 @@ import json
 from flask_basicauth import BasicAuth
 app = Flask(__name__, static_url_path='/static')
 
-app.config['BASIC_AUTH_USERNAME'] = 'admin'
-app.config['BASIC_AUTH_PASSWORD'] = 'Karaoke2019blubb'
-
 basic_auth = BasicAuth(app)
 
 @app.route("/")
@@ -38,10 +35,12 @@ def songs():
     return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
 @app.route("/api/songs/update")
+@basic_auth.required
 def update_songs():
     database.delete_all_entries()
-    database.import_songs(helpers.get_songs(helpers.get_catalog_url()))
-    return Response('{"status":"OK"}', mimetype='text/json')
+    status = database.import_songs(helpers.get_songs(helpers.get_catalog_url()))
+    print(status)
+    return Response('{"status": "%s" }' % status, mimetype='text/json')
 
 
 @app.route("/api/songs/compl")
@@ -82,6 +81,8 @@ def activate_job():
     database.create_entry_table()
     database.create_song_table()
     database.create_list_view()
+    helpers.setup_config(app)
+
 
 if __name__ == "__main__":    
     app.run(debug=True, host='0.0.0.0')
