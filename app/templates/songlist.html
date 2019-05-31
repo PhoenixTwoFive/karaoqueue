@@ -50,7 +50,7 @@
         $("#filter").keyup( function () {
             var value = $(this).val().toLowerCase();
             //alert(value);
-            if(value.length >= 3) {
+            if(value.length >= 1) {
                 $.getJSON("/api/songs/compl", { search: value }, function (data) {
                     var items = [];
                     $.each(data, function (key, val) {

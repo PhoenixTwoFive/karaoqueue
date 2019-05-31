@@ -74,7 +74,7 @@ def get_song_completions(input_string):
     cur = conn.cursor()
     # Don't look, it burns...
     cur.execute(
-        "SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE Song LIKE REPLACE(REPLACE(REPLACE(REPLACE(UPPER('%"+input_string+"%'),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ')")
+        "SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE Song LIKE REPLACE(REPLACE(REPLACE(REPLACE(UPPER('%"+input_string+"%'),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIMIT 20")
     return cur.fetchall()
 
 def add_entry(name,song_id):
