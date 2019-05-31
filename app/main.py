@@ -78,6 +78,7 @@ def admin():
 
 @app.before_first_request
 def activate_job():
+    helpers.create_data_directory()
     database.create_entry_table()
     database.create_song_table()
     database.create_list_view()

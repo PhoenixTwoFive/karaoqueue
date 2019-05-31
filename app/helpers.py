@@ -3,7 +3,13 @@ from bs4 import BeautifulSoup
 import json
 import os
 
-config_file = "config.json"
+data_directory = "data"
+config_file = data_directory+"/config.json"
+
+def create_data_directory():
+    if not os.path.exists(data_directory):
+        os.makedirs(data_directory)
+
 
 def get_catalog_url():
     r = requests.get('https://www.karafun.de/karaoke-song-list.html')

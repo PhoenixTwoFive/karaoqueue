@@ -9,7 +9,7 @@ entry_table = "entries"
 index_label = "Id"
 
 def open_db():
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect("data/test.db")
     conn.execute('PRAGMA encoding = "UTF-8";')
     return conn
 
