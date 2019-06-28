@@ -39,6 +39,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/list">Songsuche</a>
                 </li>
+                {% if auth %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/plays">Abspielliste</a>
+                </li>
+                {% endif %}
             </ul>
             <!--<form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
@@ -78,6 +83,9 @@
     </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"
+        integrity="sha256-4F7e4JsAJyLUdpP7Q8Sah866jCOhv72zU5E8lIRER4w=" crossorigin="anonymous">
     </script>
     {% block extrajs %}{% endblock %}
     <script>

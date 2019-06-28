@@ -21,7 +21,7 @@
                 <th scope="col">Name</th>
                 <th scope="col">Song</th>
                 <th scope="col">Künstler</th>
-                <th scope="col">Löschen</th>
+                <th scope="col">Aktionen</th>
             </tr>
             {% for entry in list: %}
             <tr>
@@ -35,7 +35,12 @@
                     {{ entry[2] }}
                 </td>
                 <td>
-                    <button type='button' class='btn btn-danger justify-content-center align-content-between'
+                    <button type='button' class='btn btn-success'
+                        data-toggle="tooltip" data-placement="top" title="Als gesungen markieren"
+                        onclick='markEntryAsSung({{ entry[3] }})'><i
+                            class="fas fa-check"></i></button>
+                    <button type='button' class='btn btn-danger'
+                        data-toggle="tooltip" data-placement="top" title="Eintrag löschen"
                         onclick='confirmDeleteEntry("{{ entry[0] }}",{{ entry[3] }})'><i
                             class="fas fa-trash"></i></button>
                 </td>
@@ -47,9 +52,10 @@
 </div>
 {% endblock %}
 {% block extrajs %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"
-    integrity="sha256-4F7e4JsAJyLUdpP7Q8Sah866jCOhv72zU5E8lIRER4w=" crossorigin="anonymous"></script>
 <script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
     function confirmDeleteEntry(name, entry_id) {
         bootbox.confirm("Wirklich den Eintrag von "+name+" löschen?", function(result){
             if (result) {
@@ -107,7 +113,18 @@
         type: 'GET',
         url: '/api/entries/delete/'+entry_id,
         contentType: "application/json",
-        dataType: 'json'
+        dataType: 'json',
+        async: false
+       });
+       location.reload();
+    }
+    function markEntryAsSung(entry_id) {
+       $.ajax({
+        type: 'GET',
+        url: '/api/entries/mark_sung/'+entry_id,
+        contentType: "application/json",
+        dataType: 'json',
+        async: false
        });
        location.reload();
     }
@@ -116,7 +133,8 @@
             type: 'GET',
             url: '/api/entries/delete_all',
             contentType: "application/json",
-            dataType: 'json'
+            dataType: 'json',
+            async: false
         });
         location.reload();
     }

@@ -29,6 +29,11 @@ def enqueue():
 def songlist():
     return render_template('songlist.html', list=database.get_song_list(), auth=basic_auth.authenticate())
 
+@app.route("/plays")
+@basic_auth.required
+def played_list():
+    return render_template('played_list.html', list=database.get_played_list(), auth=basic_auth.authenticate())
+
 @app.route("/api/songs")
 def songs():
     list = database.get_song_list()
@@ -63,6 +68,23 @@ def delete_entry(entry_id):
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
 
+
+@app.route("/api/entries/mark_sung/<entry_id>")
+@basic_auth.required
+def mark_sung(entry_id):
+    if database.add_sung_song(entry_id):
+        return Response('{"status": "OK"}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json')
+
+@app.route("/api/played/clear")
+@basic_auth.required
+def clear_played_songs():
+    if database.clear_played_songs():
+        return Response('{"status": "OK"}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json')
+
 @app.route("/api/entries/delete_all")
 @basic_auth.required
 def delete_all_entries():
@@ -81,7 +103,9 @@ def activate_job():
     helpers.create_data_directory()
     database.create_entry_table()
     database.create_song_table()
+    database.create_done_song_table()
     database.create_list_view()
+    database.create_done_song_view()
     helpers.setup_config(app)
 
 

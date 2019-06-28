@@ -38,3 +38,16 @@ main {
     }
 }
 
+@media print {
+    body {
+        font-size: 1.3em;
+    }
+
+    .footer {
+        display: none !important;
+    }
+
+    .admincontrols {
+        display: none;
+    }
+}

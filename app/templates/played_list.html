@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Songsuche{% endblock %}
+{% block content %}
+<div class="card admincontrols" style="width: 100%">
+    <div class="card-body">
+        <button type="button" class="topbutton btn btn-danger" onclick="confirmDeleteAllEntries()"><i
+                class="fas fa-trash mr-2"></i>Abspielliste löschen</button>
+    </div>
+</div>
+<table class="table">
+    <tr>
+        <th scope="col">Song</th>
+        <th scope="col">Wiedergaben</th>
+    </tr>
+    {% for entry in list: %}
+    <tr>
+        <td>
+            {{ entry[0] }}
+        </td>
+        <td>
+            {{ entry[1] }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</table>
+{% endblock %}
+{% block extrajs %}
+<script>
+    function confirmDeleteAllEntries() {
+        bootbox.confirm({
+            message: "Wirklich Abspielliste löschen?", 
+            buttons: {
+                confirm: {
+                    label: 'Ja',
+                    className: 'btn btn-danger'
+                },
+                cancel: {
+                    label: 'Nein',
+                    className: 'btn btn-secondary'
+                }
+            },
+            callback: function(result){
+                if (result) {
+                    deleteAllEntries()
+                }
+            }
+        })
+    }
+    function deleteAllEntries() {
+        $.ajax({
+            type: 'GET',
+            url: '/api/played/clear',
+            contentType: "application/json",
+            dataType: 'json',
+            async: false
+        });
+        location.reload();
+    }
+</script>
+{% endblock %}
