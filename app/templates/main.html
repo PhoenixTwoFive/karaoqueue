@@ -4,11 +4,13 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <table class="table">
-    <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Song</th>
-        <th scope="col">Künstler</th>
-    </tr>
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Song</th>
+            <th scope="col">Künstler</th>
+        </tr>
+    </thead>
     {% for entry in list: %}
     <tr>
         <td>

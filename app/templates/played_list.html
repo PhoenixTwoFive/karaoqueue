@@ -5,13 +5,18 @@
     <div class="card-body">
         <button type="button" class="topbutton btn btn-danger" onclick="confirmDeleteAllEntries()"><i
                 class="fas fa-trash mr-2"></i>Abspielliste löschen</button>
+        <button type="button" class="topbutton btn" onclick="printPDF()"><i class="fas fa-print mr-2"></i>Drucken</button>
+        <button type="button" class="topbutton btn" onclick="exportPDF()"><i class="fas fa-file-pdf mr-2"></i>Als PDF
+            herunterladen</button>
     </div>
 </div>
-<table class="table">
-    <tr>
-        <th scope="col">Song</th>
-        <th scope="col">Wiedergaben</th>
-    </tr>
+<table class="table" id="table">
+    <thead>
+        <tr>
+            <th scope="col">Song</th>
+            <th scope="col">Wiedergaben</th>
+        </tr>
+    </thead>
     {% for entry in list: %}
     <tr>
         <td>
@@ -26,6 +31,8 @@
 </table>
 {% endblock %}
 {% block extrajs %}
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+<script src="https://unpkg.com/jspdf-autotable@3.1.1/dist/jspdf.plugin.autotable.js"></script>
 <script>
     function confirmDeleteAllEntries() {
         bootbox.confirm({
@@ -56,6 +63,25 @@
             async: false
         });
         location.reload();
+    }
+
+    function exportPDF() {
+        var doc = new jsPDF();
+        doc.autoTable({
+            html: '#table',
+            theme: 'grid'
+        });
+        doc.save('Abspielliste.pdf');
+    }
+
+    function printPDF() {
+        var doc = new jsPDF();
+        doc.autoTable({
+            html: '#table',
+            theme: 'grid'
+        });
+        doc.autoPrint();
+        doc.output('dataurlnewwindow');
     }
 </script>
 {% endblock %}
