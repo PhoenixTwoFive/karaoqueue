@@ -47,6 +47,7 @@
 {% block extrajs %}
 <script>
     $(document).ready(function () {
+        $("#filter").focus();
         $("#filter").keyup( function () {
             var value = $(this).val().toLowerCase();
             //alert(value);
