@@ -1,7 +1,7 @@
 from flask import Flask, render_template, Response, abort, request, redirect
-import app.helpers as helpers
-import app.database as database
-import app.data_adapters as data_adapters
+import helpers
+import database
+import data_adapters
 import os, errno
 import json
 from flask_basicauth import BasicAuth
