@@ -4,53 +4,37 @@
 {% block title %}Warteliste-Admin{% endblock %}
 {% block content %}
 <div class="container">
-    <div class="row">
-        <div class="card" style="width: 100%">
-            <div class="card-body">
-                <button type="button" class="topbutton btn btn-danger"
-                    onclick="confirmDeleteAllEntries()"><i class="fas fa-trash mr-2"></i>Alle Einträge löschen</button>
-                <button type="button" class="topbutton btn btn-danger"
-                    onclick="confirmUpdateSongDatabase()"><i class="fas fa-file-import mr-2"></i>Song-Datenbank
-                    aktualisieren</button>
-            </div>
-        </div>
+    <div id="toolbar">
+        <button type="button" class="topbutton btn btn-danger" onclick="confirmDeleteSelectedEntries()"><i
+                class="fas fa-trash mr-2"></i>Gewählte Einträge löschen</button>
+        <button type="button" class="topbutton btn btn-danger" onclick="confirmUpdateSongDatabase()"><i
+                class="fas fa-file-import mr-2"></i>Song-Datenbank
+            aktualisieren</button>
     </div>
-    <div class="row">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Song</th>
-                    <th scope="col">Künstler</th>
-                    <th scope="col">Aktionen</th>
-                </tr>
-            </thead>
-            {% for entry in list: %}
+    <table class="table"
+            id="entrytable"
+            data-toggle="table"
+            data-search="true"
+            data-show-columns="true"
+            data-show-toggle="true"
+            data-multiple-select-row="true"
+            data-click-to-select="true"
+            data-toolbar="#toolbar"
+            data-pagination="true"
+            data-show-extended-pagination="true"
+            data-classes="table table-hover"
+            data-url="/api/queue">
+        <thead>
             <tr>
-                <td>
-                    {{ entry[0] }}
-                </td>
-                <td>
-                    {{ entry[1] }}
-                </td>
-                <td>
-                    {{ entry[2] }}
-                </td>
-                <td>
-                    <button type='button' class='btn btn-success'
-                        data-toggle="tooltip" data-placement="top" title="Als gesungen markieren"
-                        onclick='markEntryAsSung({{ entry[3] }})'><i
-                            class="fas fa-check"></i></button>
-                    <button type='button' class='btn btn-danger'
-                        data-toggle="tooltip" data-placement="top" title="Eintrag löschen"
-                        onclick='confirmDeleteEntry("{{ entry[0] }}",{{ entry[3] }})'><i
-                            class="fas fa-trash"></i></button>
-                </td>
+                <th data-field="state" data-checkbox="true"></th>
+                <th scope="col" data-field="Name">Name</th>
+                <th scope="col" data-field="Title">Song</th>
+                <th scope="col" data-field="Artist">Künstler</th>
+                <th scope="col" data-formatter="TableActions">Aktionen</th>
             </tr>
-            {% endfor %}
-        </table>
-        <a name="end"></a>
-    </div>
+        </thead>
+    </table>
+    <a name="end"></a>
 </div>
 {% endblock %}
 {% block extrajs %}
@@ -65,9 +49,9 @@
             }
         })
     }
-    function confirmDeleteAllEntries() {
+    function confirmDeleteSelectedEntries() {
         bootbox.confirm({
-            message: "Wirklich alle Eintragungen löschen?", 
+            message: "Wirklich gewählte Eintragungen löschen?", 
             buttons: {
                 confirm: {
                     label: 'Ja',
@@ -80,7 +64,7 @@
             },
             callback: function(result){
                 if (result) {
-                    deleteAllEntries()
+                    DeleteSelectedEntries(getIdSelections())
                 }
             }
         })
@@ -118,7 +102,7 @@
         dataType: 'json',
         async: false
        });
-       location.reload();
+       $("#entrytable").bootstrapTable('refresh')
     }
     function markEntryAsSung(entry_id) {
        $.ajax({
@@ -128,17 +112,24 @@
         dataType: 'json',
         async: false
        });
-       location.reload();
+       $("#entrytable").bootstrapTable('refresh')
     }
-    function deleteAllEntries() {
+    function DeleteSelectedEntries(ids) {
         $.ajax({
-            type: 'GET',
-            url: '/api/entries/delete_all',
+            type: 'POST',
+            url: '/api/entries/delete',
+            data: JSON.stringify(ids), // or JSON.stringify ({name: 'jonas'}),
+            error: function() {
+                bootbox.alert({
+                    message: "Fehler beim Löschen der Eintragungen.",
+                })
+            },
+            success: function() {
+                $("#entrytable").bootstrapTable('refresh')
+            },
             contentType: "application/json",
-            dataType: 'json',
-            async: false
+            dataType: 'json'
         });
-        location.reload();
     }
     function updateSongDatabase(wait_dialog) {
         $.ajax({
@@ -150,10 +141,18 @@
                 wait_dialog.modal('hide')
                 bootbox.alert({
                     message: data["status"],
-                    callback: function() {location.reload()}
+                    callback: function() {$("#entrytable").bootstrapTable('refresh')}
                 })
             }
         });
+    }
+    function TableActions (value, row, index) {
+        return "<button type='button' class='btn btn-success' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick='markEntryAsSung("+row.ID+")'><i class=\"fas fa-check\"></i></button>&nbsp;<button type='button' class='btn btn-danger' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick='confirmDeleteEntry(\""+row.Name+"\","+row.ID+")'><i class=\"fas fa-trash\"></i></button>";
+    }
+    function getIdSelections() {
+        return $.map($("#entrytable").bootstrapTable('getSelections'), function (row) {
+            return row.ID
+        })
     }
 </script>
 {% endblock %}

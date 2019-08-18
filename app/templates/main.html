@@ -3,28 +3,19 @@
 {% extends 'base.html' %}
 {% block title %}Warteliste{% endblock %}
 {% block content %}
-<a role="button" class="btn btn-primary btn-lg btn-block" href="/list">Eintragen</a>
-<table class="table">
+<a role="button" class="btn btn-primary btn-lg btn-block mb-2" href="/list">Eintragen</a>
+<table class="table"
+        data-toggle="table"
+        data-url="/api/queue"
+        data-pagination="true"
+        data-classes="table">
     <thead>
         <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Song</th>
-            <th scope="col">Künstler</th>
+            <th scope="col" data-field="Name">Name</th>
+            <th scope="col" data-field="Title">Song</th>
+            <th scope="col" data-field="Artist">Künstler</th>
         </tr>
     </thead>
-    {% for entry in list: %}
-    <tr>
-        <td>
-            {{ entry[0] }}
-        </td>
-        <td>
-            {{ entry[1] }}
-        </td>
-        <td>
-            {{ entry[2] }}
-        </td>
-    </tr>
-    {% endfor %}
 </table>
 <a name="end"></a>
 {% endblock %}

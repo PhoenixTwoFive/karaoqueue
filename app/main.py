@@ -1,6 +1,7 @@
 from flask import Flask, render_template, Response, abort, request, redirect
-import helpers
-import database
+import app.helpers as helpers
+import app.database as database
+import app.data_adapters as data_adapters
 import os, errno
 import json
 from flask_basicauth import BasicAuth
@@ -28,6 +29,11 @@ def enqueue():
 @app.route("/list")
 def songlist():
     return render_template('songlist.html', list=database.get_song_list(), auth=basic_auth.authenticate())
+
+@app.route("/api/queue")
+def queue_json():
+    list = data_adapters.dict_from_rows(database.get_list())
+    return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
 @app.route("/plays")
 @basic_auth.required
@@ -67,6 +73,20 @@ def delete_entry(entry_id):
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
+
+
+@app.route("/api/entries/delete", methods=['POST'])
+@basic_auth.required
+def delete_entries():
+    if not request.json:
+        print(request.data)
+        abort(400)
+        return
+    updates = database.delete_entries(request.json)
+    if updates >= 0:
+        return Response('{"status": "OK", "updates": '+str(updates)+'}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
 
 
 @app.route("/api/entries/mark_sung/<entry_id>")

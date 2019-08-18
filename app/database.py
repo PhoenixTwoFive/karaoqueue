@@ -74,6 +74,7 @@ def create_done_song_view():
 
 def get_list():
     conn = open_db()
+    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute("SELECT * FROM Liste")
     return cur.fetchall()
@@ -140,6 +141,20 @@ def delete_entry(id):
     conn.close()
     return True
 
+
+def delete_entries(ids):
+    idlist = []
+    for x in ids:
+        idlist.append( (x,) )
+    try:
+        conn = open_db()
+        cur = conn.cursor()
+        cur.executemany("DELETE FROM entries WHERE id=?", idlist)
+        conn.commit()
+        conn.close()
+        return cur.rowcount
+    except sqlite3.Error as error:
+        return -1
 
 def delete_all_entries():
     conn = open_db()

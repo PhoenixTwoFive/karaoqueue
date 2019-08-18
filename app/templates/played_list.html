@@ -1,15 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}Abspielliste{% endblock %}
 {% block content %}
-<div class="card admincontrols" style="width: 100%">
-    <div class="card-body">
-        <button type="button" class="topbutton btn btn-danger" onclick="confirmDeleteAllEntries()"><i
-                class="fas fa-trash mr-2"></i>Abspielliste löschen</button>
-        <button type="button" class="topbutton btn btn-primary" onclick="exportPDF()"><i class="fas fa-file-pdf mr-2"></i>Als PDF herunterladen</button>
-        <button type="button" class="topbutton btn btn-secondary" onclick="printPDF()"><i class="fas fa-print mr-2"></i>Drucken</button>
-    </div>
+<div id="toolbar">
+    <button type="button" class="topbutton btn btn-danger" onclick="confirmDeleteAllEntries()"><i
+            class="fas fa-trash mr-2"></i>Abspielliste löschen</button>
+    <button type="button" class="topbutton btn btn-primary" onclick="exportPDF()"><i
+            class="fas fa-file-pdf mr-2"></i>Als PDF herunterladen</button>
+    <button type="button" class="topbutton btn btn-secondary" onclick="printPDF()"><i
+            class="fas fa-print mr-2"></i>Drucken</button>
 </div>
-<table class="table" id="table">
+<table class="table"
+        id="table"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true"
+        data-toolbar="#toolbar"
+        data-pagination="true"
+        data-classes="table table-bordered table-striped"
+        data-show-extended-pagination="true">
     <thead>
         <tr>
             <th scope="col">Song</th>
@@ -67,7 +75,8 @@
     function exportPDF() {
         var doc = new jsPDF();
         doc.autoTable({
-            html: '#table',
+            head: [["Song","Wiedergaben"]],
+            body: createTableArray(),
             theme: 'grid'
         });
         doc.save('Abspielliste.pdf');
@@ -76,11 +85,18 @@
     function printPDF() {
         var doc = new jsPDF();
         doc.autoTable({
-            html: '#table',
+            head: [["Song","Wiedergaben"]],
+            body: createTableArray(),
             theme: 'grid'
         });
         doc.autoPrint();
         doc.output('dataurlnewwindow');
+    }
+
+    function createTableArray() {
+        var data = $("#table").bootstrapTable('getData')
+        out = data.map(x => [x["0"],x["1"]])
+        return out;
     }
 </script>
 {% endblock %}

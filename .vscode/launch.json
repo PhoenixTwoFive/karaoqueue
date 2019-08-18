@@ -6,6 +6,7 @@
     "configurations": [
 
 
+
         {"name":"Python: Flask","type":"python","request":"launch","module":"flask","env":{"FLASK_APP":"app/main.py","FLASK_ENV":"development","FLASK_DEBUG":"1"},"args":["run","--no-debugger","--no-reload"],"jinja":true},
         {"name":"Python: Flask (with reload)","type":"python","request":"launch","module":"flask","env":{"FLASK_APP":"app/main.py","FLASK_ENV":"development","FLASK_DEBUG":"1"},"args":["run","--no-debugger"],"jinja":true},
         {
@@ -21,6 +22,24 @@
             "args": [
                 "run",
                 "--no-debugger",
+                "--host='0.0.0.0'"
+            ],
+            "jinja": true
+        },
+        {
+            "name": "Python: Flask (externally reachable)",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "app/main.py",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload",
                 "--host='0.0.0.0'"
             ],
             "jinja": true
@@ -64,21 +83,6 @@
                 "--nothreading"
             ],
             "django": true
-        },
-        {
-            "name": "Python: Flask",
-            "type": "python",
-            "request": "launch",
-            "module": "flask",
-            "env": {
-                "FLASK_APP": "app.py"
-            },
-            "args": [
-                "run",
-                "--no-debugger",
-                "--no-reload"
-            ],
-            "jinja": true
         },
         {
             "name": "Python: Current File (External Terminal)",
