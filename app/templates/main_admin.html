@@ -43,10 +43,9 @@
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();
         $('#entryToggle').change(function() {
-            $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0")});
-            refreshEntryToggle()
+            $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0"), complete: refreshEntryToggle});
         })
-        refreshEntryToggle()
+        refreshEntryToggle();
     })
     function confirmDeleteEntry(name, entry_id) {
         bootbox.confirm("Wirklich den Eintrag von "+name+" löschen?", function(result){
