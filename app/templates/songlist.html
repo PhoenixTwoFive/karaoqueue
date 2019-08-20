@@ -47,7 +47,7 @@
                     $.each(data, function (key, val) {
                         items.push("<tr><td>"+val[0]+`</td>
                             <td><button type='button'
-                                    class='btn btn-primary justify-content-center align-content-between'
+                                    class='btn btn-primary justify-content-center align-content-between enqueueButton'
                                     data-toggle='modal'
                                     data-target='#enqueueModal' onclick='setSelectedId(`+val[1]+`)'><i
                                         class="fas fa-plus"></i></button></td>
@@ -62,6 +62,12 @@
             }
         });
 
+        $.getJSON("/api/entries/accept", (data) => {
+            if (data["value"]==0) {
+                $("#filter").prop("disabled",true);
+            }
+        })
+
         $("#nameForm").submit( function (e) {
             e.preventDefault();
             submitModal();
@@ -69,7 +75,7 @@
     });
 
     
-    function enqueue(id,name,success_callback) {
+    function enqueue(id,name,success_callback, blocked_callback) {
         var data = {
             "name": name,
             "id": id
@@ -79,6 +85,9 @@
             url: '/api/enqueue',
             data: JSON.stringify(data), // or JSON.stringify ({name: 'jonas'}),
             success: success_callback,
+            statusCode: {
+                423: blocked_callback
+            },
             contentType: "application/json",
             dataType: 'json'
         });
@@ -91,9 +100,16 @@
     function submitModal() {
         var name = $("#singerNameInput").val();
         var id = $("#selectedId").attr("value");
-        enqueue(id,name,function(){
+        enqueue(id,name,function () {
             $("#enqueueModal").modal('hide');
             window.location.href = '/#end';
+        }, function () {
+            bootbox.alert({
+                    message: "Es werden leider keine neuen Anmeldungen mehr angenommen. Tut mir leid :(",
+                });
+            $(".enqueueButton").prop("disabled",true);
+            $("#enqueueModal").modal('hide');
+
         });
         
 

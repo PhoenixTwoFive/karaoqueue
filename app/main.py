@@ -8,6 +8,7 @@ from flask_basicauth import BasicAuth
 app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
+accept_entries = False
 
 @app.route("/")
 def home():
@@ -18,13 +19,17 @@ def home():
 
 @app.route('/api/enqueue', methods=['POST'])
 def enqueue():
-    if not request.json:
-        print(request.data)
-        abort(400)
-    name = request.json['name']
-    song_id = request.json['id']
-    database.add_entry(name,song_id)
-    return Response('{"status":"OK"}', mimetype='text/json')
+    if accept_entries:
+        if not request.json:
+            print(request.data)
+            abort(400)
+        name = request.json['name']
+        song_id = request.json['id']
+        database.add_entry(name, song_id)
+        return Response('{"status":"OK"}', mimetype='text/json')
+    else:
+        return Response('{"status":"Currently not accepting entries"}', mimetype='text/json',status=423)
+    
 
 @app.route("/list")
 def songlist():
@@ -96,6 +101,23 @@ def mark_sung(entry_id):
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
+
+@app.route("/api/entries/accept/<value>")
+@basic_auth.required
+def set_accept_entries(value):
+    global accept_entries
+    if (value=='0' or value=='1'):
+        accept_entries=bool(int(value))
+        return Response('{"status": "OK"}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
+
+
+@app.route("/api/entries/accept")
+def get_accept_entries():
+    global accept_entries
+    return Response('{"status": "OK", "value": '+str(int(accept_entries))+'}', mimetype='text/json')
+    
 
 @app.route("/api/played/clear")
 @basic_auth.required

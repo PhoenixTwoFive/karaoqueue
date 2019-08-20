@@ -10,6 +10,7 @@
         <button type="button" class="topbutton btn btn-danger" onclick="confirmUpdateSongDatabase()"><i
                 class="fas fa-file-import mr-2"></i>Song-Datenbank
             aktualisieren</button>
+        <input id="entryToggle" type="checkbox" class="topbutton" data-toggle="toggle" data-on="Eintragen erlaubt" data-off="Eintragen deaktiviert" data-onstyle="success" data-offstyle="danger">
     </div>
     <table class="table"
             id="entrytable"
@@ -40,7 +41,12 @@
 {% block extrajs %}
 <script>
     $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
+        $('[data-toggle="tooltip"]').tooltip();
+        $('#entryToggle').change(function() {
+            $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0")});
+            refreshEntryToggle()
+        })
+        refreshEntryToggle()
     })
     function confirmDeleteEntry(name, entry_id) {
         bootbox.confirm("Wirklich den Eintrag von "+name+" löschen?", function(result){
@@ -90,6 +96,18 @@
                         closeButton: false
                     });
                     updateSongDatabase(dialog)                    
+                }
+            }
+        })
+    }
+    function refreshEntryToggle() {
+        $.getJSON("/api/entries/accept", (data) => {
+            if (data["value"]!=$('#entryToggle').is(":checked")) {
+                if(data["value"]==1) {
+                $('#entryToggle').bootstrapToggle('on')
+                }
+                else {
+                    $('#entryToggle').bootstrapToggle('off')
                 }
             }
         })
