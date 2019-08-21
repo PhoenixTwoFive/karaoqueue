@@ -56,7 +56,7 @@
     
                     $("#songtable").html("")
                     $(items.join("")).appendTo("#songtable");
-                    entriesAccepted()                    
+                    entriesAccepted()
                 });
             } else {
                 $("#songtable").html("")
@@ -112,7 +112,16 @@
 
     function entriesAccepted() {
         $.getJSON("/api/entries/accept", (data,out) => {
-            $(".enqueueButton").prop("disabled",!data["value"])
+            if(data["value"]==0) {
+                $(".enqueueButton").prop("disabled",true)
+                $(".enqueueButton").prop("style","pointer-events: none;")
+                $(".enqueueButton").wrap("<span class='tooltip-span' tabindex='0' data-toggle='tooltip' data-placement='top'></span>" );
+                $(".tooltip-span").prop("title","Eintragungen sind leider nicht mehr möglich.")
+                $('[data-toggle="tooltip"]').tooltip()
+            } else {
+                $(".enqueueButton").prop("disabled",false)
+            }
+            
         })
     }
 

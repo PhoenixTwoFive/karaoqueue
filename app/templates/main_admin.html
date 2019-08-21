@@ -41,11 +41,13 @@
 {% block extrajs %}
 <script>
     $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
         $('#entryToggle').change(function() {
             $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0"), complete: setTimeout(refreshEntryToggle, 500)});
         })
-        refreshEntryToggle();
+        refreshEntryToggle()
+        $("#entrytable").bootstrapTable().on('load-success.bs.table', function() {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
     })
     function confirmDeleteEntry(name, entry_id) {
         bootbox.confirm("Wirklich den Eintrag von "+name+" löschen?", function(result){
@@ -120,6 +122,7 @@
         async: false
        });
        $("#entrytable").bootstrapTable('refresh')
+    
     }
     function markEntryAsSung(entry_id) {
        $.ajax({
@@ -130,6 +133,7 @@
         async: false
        });
        $("#entrytable").bootstrapTable('refresh')
+    
     }
     function DeleteSelectedEntries(ids) {
         $.ajax({
@@ -143,6 +147,7 @@
             },
             success: function() {
                 $("#entrytable").bootstrapTable('refresh')
+            
             },
             contentType: "application/json",
             dataType: 'json'
@@ -158,13 +163,15 @@
                 wait_dialog.modal('hide')
                 bootbox.alert({
                     message: data["status"],
-                    callback: function() {$("#entrytable").bootstrapTable('refresh')}
+                    callback: function() {
+                        $("#entrytable").bootstrapTable('refresh')
+                    }
                 })
             }
         });
     }
     function TableActions (value, row, index) {
-        return "<button type='button' class='btn btn-success' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick='markEntryAsSung("+row.ID+")'><i class=\"fas fa-check\"></i></button>&nbsp;<button type='button' class='btn btn-danger' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick='confirmDeleteEntry(\""+row.Name+"\","+row.ID+")'><i class=\"fas fa-trash\"></i></button>";
+        return "<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"markEntryAsSung("+row.ID+")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"confirmDeleteEntry('"+row.Name+"',"+row.ID+")\"><i class=\"fas fa-trash\"></i></button>";
     }
     function getIdSelections() {
         return $.map($("#entrytable").bootstrapTable('getSelections'), function (row) {
