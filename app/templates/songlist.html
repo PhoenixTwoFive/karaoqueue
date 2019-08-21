@@ -56,17 +56,12 @@
     
                     $("#songtable").html("")
                     $(items.join("")).appendTo("#songtable");
+                    entriesAccepted()                    
                 });
             } else {
                 $("#songtable").html("")
             }
         });
-
-        $.getJSON("/api/entries/accept", (data) => {
-            if (data["value"]==0) {
-                $("#filter").prop("disabled",true);
-            }
-        })
 
         $("#nameForm").submit( function (e) {
             e.preventDefault();
@@ -114,5 +109,12 @@
         
 
     }
+
+    function entriesAccepted() {
+        $.getJSON("/api/entries/accept", (data,out) => {
+            $(".enqueueButton").prop("disabled",!data["value"])
+        })
+    }
+
 </script>
 {% endblock %}

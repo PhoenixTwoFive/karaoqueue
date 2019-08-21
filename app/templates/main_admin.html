@@ -43,7 +43,7 @@
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();
         $('#entryToggle').change(function() {
-            $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0"), complete: refreshEntryToggle});
+            $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0"), complete: setTimeout(refreshEntryToggle, 500)});
         })
         refreshEntryToggle();
     })
