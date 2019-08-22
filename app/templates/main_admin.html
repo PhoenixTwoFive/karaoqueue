@@ -3,6 +3,12 @@
 {% extends 'base.html' %}
 {% block title %}Warteliste-Admin{% endblock %}
 {% block content %}
+<style>
+table td:nth-child(2) {
+    max-width: 450px !important;
+    overflow: scroll;
+}
+</style>
 <div class="container">
     <div id="toolbar">
         <button type="button" class="topbutton btn btn-danger" onclick="confirmDeleteSelectedEntries()"><i
@@ -24,7 +30,10 @@
             data-pagination="true"
             data-show-extended-pagination="true"
             data-classes="table table-hover"
-            data-url="/api/queue">
+            data-url="/api/queue"
+            data-show-refresh="true"
+            data-auto-refresh="true"
+            data-auto-refresh-interval="10">
         <thead>
             <tr>
                 <th data-field="state" data-checkbox="true"></th>

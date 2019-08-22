@@ -33,6 +33,25 @@ table td {
     text-overflow: ellipsis;
 }
 
+tbody tr:first-child {
+    background-color: #007bff80;
+    font-weight: 600;
+}
+
+tbody tr:nth-child(2) {
+    background-color: #007bff40;
+    font-weight: 500;
+}
+
+tbody tr:nth-child(3) {
+    background-color: #007bff20;
+    font-weight: 400;
+}
+
+tbody tr:nth-child(4) {
+    background-color: #007bff10;
+}
+
 table td:first-child {
     max-width: 200px !important;
 }
