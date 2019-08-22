@@ -28,6 +28,15 @@ main {
     width: 100%;
 }
 
+table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+table td:first-child {
+    max-width: 200px !important;
+}
+
 @media (min-width: 768px) {
     .topbutton {
         width: auto;
