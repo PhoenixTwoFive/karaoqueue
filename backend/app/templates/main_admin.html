@@ -5,8 +5,10 @@
 {% block content %}
 <style>
 table td:nth-child(2) {
-    max-width: 450px !important;
-    overflow: scroll;
+    overflow-y: hidden;
+    overflow-x: auto;
+    text-overflow: clip;
+    max-width: 200px !important;
 }
 </style>
 <div class="container">
