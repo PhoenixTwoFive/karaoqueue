@@ -33,22 +33,22 @@ table td {
     text-overflow: ellipsis;
 }
 
-table.entries tbody tr:first-child {
+table.entries tbody tr[data-index="0"] {
     background-color: #007bff80;
     font-weight: 600;
 }
 
-table.entries tbody tr:nth-child(2) {
+table.entries tbody tr[data-index="1"] {
     background-color: #007bff40;
     font-weight: 500;
 }
 
-table.entries tbody tr:nth-child(3) {
+table.entries tbody tr[data-index="2"] {
     background-color: #007bff20;
     font-weight: 400;
 }
 
-table.entries tbody tr:nth-child(4) {
+table.entries tbody tr[data-index="3"] {
     background-color: #007bff10;
 }
 
