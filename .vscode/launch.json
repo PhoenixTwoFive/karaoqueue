@@ -7,15 +7,15 @@
 
 
 
-        {"name":"Python: Flask","type":"python","request":"launch","module":"flask","env":{"FLASK_APP":"app/main.py","FLASK_ENV":"development","FLASK_DEBUG":"1"},"args":["run","--no-debugger","--no-reload"],"jinja":true},
-        {"name":"Python: Flask (with reload)","type":"python","request":"launch","module":"flask","env":{"FLASK_APP":"app/main.py","FLASK_ENV":"development","FLASK_DEBUG":"1"},"args":["run","--no-debugger"],"jinja":true},
+        {"name":"Python: Flask","type":"python","request":"launch","module":"flask","env":{"FLASK_APP":"backend/app/main.py","FLASK_ENV":"development","FLASK_DEBUG":"1"},"args":["run","--no-debugger","--no-reload"],"jinja":true},
+        {"name":"Python: Flask (with reload)","type":"python","request":"launch","module":"flask","env":{"FLASK_APP":"backend/app/main.py","FLASK_ENV":"development","FLASK_DEBUG":"1"},"args":["run","--no-debugger"],"jinja":true},
         {
             "name": "Python: Flask (with reload, externally reachable)",
             "type": "python",
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "app/main.py",
+                "FLASK_APP": "backend/app/main.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
@@ -32,7 +32,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "app/main.py",
+                "FLASK_APP": "backend/app/main.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
