@@ -89,15 +89,17 @@ def get_played_list():
 def get_song_list():
     conn =open_db()
     cur = conn.cursor()
-    cur.execute("SELECT Artist || \" - \" || Title AS Song, Id FROM songs")
+    cur.execute("SELECT Artist || \" - \" || Title AS Song, Id FROM songs;")
     return cur.fetchall()
 
 def get_song_completions(input_string):
     conn = open_db()
     cur = conn.cursor()
     # Don't look, it burns...
+    prepared_string = "%{0}%".format(input_string).upper()  # "Test" -> "%TEST%"
+    print(prepared_string)
     cur.execute(
-        "SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE Song LIKE REPLACE(REPLACE(REPLACE(REPLACE(UPPER('%"+input_string+"%'),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIMIT 20")
+        "SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE REPLACE(REPLACE(REPLACE(REPLACE(UPPER( SONG ),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIKE (?) LIMIT 20;", (prepared_string,))
     return cur.fetchall()
 
 def add_entry(name,song_id):
