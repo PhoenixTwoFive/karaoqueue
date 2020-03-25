@@ -1,6 +1,11 @@
 <div>
-  <mat-toolbar color="primary">
+  <mat-toolbar color="primary" class="mat-elevation-z6">
     <span>KaraoQueue</span>
+    <span>&nbsp;</span>
+    <a mat-button routerLink="/" [routerLinkActive]="['is-active']">Warteschlange</a>
+    <a mat-button routerLink="/songs" [routerLinkActive]="['is-active']">Songs</a>
+    <div class="spacer"></div>
+    <a mat-stroked-button>Login</a>
   </mat-toolbar>
 </div>
 <router-outlet></router-outlet>
