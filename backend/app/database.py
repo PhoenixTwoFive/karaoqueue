@@ -9,6 +9,13 @@ entry_table = "entries"
 index_label = "Id"
 done_table  = "done_songs"
 
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
 def open_db():
     conn = sqlite3.connect("data/test.db")
     conn.execute('PRAGMA encoding = "UTF-8";')
@@ -94,12 +101,13 @@ def get_song_list():
 
 def get_song_completions(input_string):
     conn = open_db()
+    conn.row_factory = dict_factory
     cur = conn.cursor()
     # Don't look, it burns...
     prepared_string = "%{0}%".format(input_string).upper()  # "Test" -> "%TEST%"
     print(prepared_string)
     cur.execute(
-        "SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE REPLACE(REPLACE(REPLACE(REPLACE(UPPER( SONG ),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIKE (?) LIMIT 20;", (prepared_string,))
+        "SELECT * FROM songs WHERE REPLACE(REPLACE(REPLACE(REPLACE(UPPER( Title ),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIKE (?) LIMIT 20;", (prepared_string,))
     return cur.fetchall()
 
 def add_entry(name,song_id):

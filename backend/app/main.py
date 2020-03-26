@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, abort, request, redirect
+from flask_cors import CORS
 import helpers
 import database
 import data_adapters
@@ -7,6 +8,7 @@ import json
 from flask_basicauth import BasicAuth
 app = Flask(__name__, static_url_path='/static')
 
+CORS(app)
 basic_auth = BasicAuth(app)
 accept_entries = False
 
@@ -65,7 +67,8 @@ def get_song_completions(input_string=""):
     if input_string!="":
         print(input_string)
         list = database.get_song_completions(input_string=input_string)
-        return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
+        return Response(json.dumps(list).encode('utf-8'), mimetype='application/json')
+#        return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
     else:
         return 400
