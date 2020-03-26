@@ -1,17 +1,42 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Song } from './models/song.model';
+import { Artist } from './models/artist.model';
+import { Genre } from './models/genre.model';
+import { Language } from './models/language.model';
+import { RuntimeConfigLoaderService } from 'runtime-config-loader';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SongServiceService {
 
+  private api: string;
   constructor(
-    private http: HttpClient
-  ) {}
-
-  searchSongByText(text:string):Array<Song> {
-      return [new Song()];
+    private http: HttpClient,
+    private configSvc: RuntimeConfigLoaderService
+  ) {
+    this.api=configSvc.getConfigObjectKey("api");
   }
+
+  searchSongByText(text: string): Observable<Array<Song>> {
+
+
+    let out = new Array<Song>();
+
+    this.http.get(this.api +"/songs/compl?search="+text).subscribe((data: Observable<JSON>) => {
+      data.forEach(element => {
+        out.push(new Song(element["Title"],new Artist(42,element["Artist"]),element["Id"],element["Duo"],element["Explicit"],42,[new Genre(42,element["Styles"])],[new Language(42, element["Languages"])]));
+      });
+    });
+
+    const observable = new Observable<Array<Song>>( subscriber => {
+      subscriber.next(out);
+    })
+
+
+    return observable;
+  }
+
 }
