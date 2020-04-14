@@ -18,73 +18,11 @@ table td:nth-child(2) {
             aktualisieren</button>
         <input id="entryToggle" type="checkbox" class="topbutton" data-toggle="toggle" data-on="Eintragen erlaubt" data-off="Eintragen deaktiviert" data-onstyle="success" data-offstyle="danger">
     </div>
-    <table class="table entries"
-            id="entrytable"
-            data-toggle="table"
-            data-search="true"
-            data-show-columns="true"
-            data-show-toggle="true"
-            data-multiple-select-row="true"
-            data-click-to-select="true"
-            data-toolbar="#toolbar"
-            data-pagination="true"
-            data-show-extended-pagination="true"
-            data-classes="table table-hover"
-            data-url="/api/queue"
-            data-show-refresh="true"
-            data-auto-refresh="true"
-            data-auto-refresh-interval="10">
-        <thead>
-            <tr>
-                <th data-field="state" data-checkbox="true"></th>
-                <th scope="col" data-field="Name">Name</th>
-                <th scope="col" data-field="Title">Song</th>
-                <th scope="col" data-field="Artist">Künstler</th>
-                <th scope="col" data-formatter="TableActions">Aktionen</th>
-            </tr>
-        </thead>
-    </table>
     <a name="end"></a>
 </div>
 {% endblock %}
 {% block extrajs %}
 <script>
-    $(function () {
-        $('#entryToggle').change(function() {
-            $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0"), complete: setTimeout(refreshEntryToggle, 1000)});
-        })
-        refreshEntryToggle()
-        $("#entrytable").bootstrapTable().on('load-success.bs.table', function() {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-    })
-    function confirmDeleteEntry(name, entry_id) {
-        bootbox.confirm("Wirklich den Eintrag von "+name+" löschen?", function(result){
-            if (result) {
-                deleteEntry(entry_id)
-            }
-        })
-    }
-    function confirmDeleteSelectedEntries() {
-        bootbox.confirm({
-            message: "Wirklich gewählte Eintragungen löschen?", 
-            buttons: {
-                confirm: {
-                    label: 'Ja',
-                    className: 'btn btn-danger'
-                },
-                cancel: {
-                    label: 'Nein',
-                    className: 'btn btn-secondary'
-                }
-            },
-            callback: function(result){
-                if (result) {
-                    DeleteSelectedEntries(getIdSelections())
-                }
-            }
-        })
-    }
     function confirmUpdateSongDatabase() {
         bootbox.confirm({
             message: "Wirklich die Song-Datenbank aktualisieren?<br>Dies lädt die Aktuelle Song-Liste von <a href='https://www.karafun.de/karaoke-song-list.html'>KaraFun</a> herunter, <b>und wird alle Eintragungen löschen!</b>",
@@ -110,58 +48,6 @@ table td:nth-child(2) {
             }
         })
     }
-    function refreshEntryToggle() {
-        $.getJSON("/api/entries/accept", (data) => {
-            if (data["value"]!=$('#entryToggle').is(":checked")) {
-                if(data["value"]==1) {
-                $('#entryToggle').bootstrapToggle('on')
-                }
-                else {
-                    $('#entryToggle').bootstrapToggle('off')
-                }
-            }
-        })
-    }
-    function deleteEntry(entry_id) {
-       $.ajax({
-        type: 'GET',
-        url: '/api/entries/delete/'+entry_id,
-        contentType: "application/json",
-        dataType: 'json',
-        async: false
-       });
-       $("#entrytable").bootstrapTable('refresh')
-    
-    }
-    function markEntryAsSung(entry_id) {
-       $.ajax({
-        type: 'GET',
-        url: '/api/entries/mark_sung/'+entry_id,
-        contentType: "application/json",
-        dataType: 'json',
-        async: false
-       });
-       $("#entrytable").bootstrapTable('refresh')
-    
-    }
-    function DeleteSelectedEntries(ids) {
-        $.ajax({
-            type: 'POST',
-            url: '/api/entries/delete',
-            data: JSON.stringify(ids), // or JSON.stringify ({name: 'jonas'}),
-            error: function() {
-                bootbox.alert({
-                    message: "Fehler beim Löschen der Eintragungen.",
-                })
-            },
-            success: function() {
-                $("#entrytable").bootstrapTable('refresh')
-            
-            },
-            contentType: "application/json",
-            dataType: 'json'
-        });
-    }
     function updateSongDatabase(wait_dialog) {
         $.ajax({
             type: 'GET',
@@ -178,14 +64,6 @@ table td:nth-child(2) {
                 })
             }
         });
-    }
-    function TableActions (value, row, index) {
-        return "<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"markEntryAsSung("+row.ID+")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"confirmDeleteEntry('"+row.Name+"',"+row.ID+")\"><i class=\"fas fa-trash\"></i></button>";
-    }
-    function getIdSelections() {
-        return $.map($("#entrytable").bootstrapTable('getSelections'), function (row) {
-            return row.ID
-        })
     }
 </script>
 {% endblock %}

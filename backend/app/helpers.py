@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+import datetime
+import bson.objectid
 
 data_directory = "data"
 config_file = data_directory+"/config.json"
@@ -37,3 +39,10 @@ def setup_config(app):
         print("Wrote new config")
     app.config['BASIC_AUTH_USERNAME'] = config['username']
     app.config['BASIC_AUTH_PASSWORD'] = config['password']
+
+
+def serialization_helper(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    elif isinstance(obj, bson.objectid.ObjectId):
+        return str(obj)

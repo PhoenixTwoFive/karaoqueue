@@ -5,7 +5,9 @@ import database
 import data_adapters
 import os, errno
 import json
+
 from flask_basicauth import BasicAuth
+from pprint import pprint
 app = Flask(__name__, static_url_path='/static')
 
 CORS(app)
@@ -55,7 +57,7 @@ def songs():
 @app.route("/api/songs/update")
 @basic_auth.required
 def update_songs():
-    database.delete_all_entries()
+#    database.delete_all_entries()
     status = database.import_songs(helpers.get_songs(helpers.get_catalog_url()))
     print(status)
     return Response('{"status": "%s" }' % status, mimetype='text/json')
@@ -67,7 +69,7 @@ def get_song_completions(input_string=""):
     if input_string!="":
         print(input_string)
         list = database.get_song_completions(input_string=input_string)
-        return Response(json.dumps(list).encode('utf-8'), mimetype='application/json')
+        return Response(json.dumps(list, default=helpers.serialization_helper).encode('utf-8'), mimetype='application/json')
 #        return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
     else:
@@ -146,11 +148,6 @@ def admin():
 @app.before_first_request
 def activate_job():
     helpers.create_data_directory()
-    database.create_entry_table()
-    database.create_song_table()
-    database.create_done_song_table()
-    database.create_list_view()
-    database.create_done_song_view()
     helpers.setup_config(app)
 
 

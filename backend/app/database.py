@@ -2,12 +2,14 @@
 
 import sqlite3
 import pandas
+import pymongo
+from bson.regex import Regex
 from io import StringIO
 
-song_table  = "songs"
-entry_table = "entries"
-index_label = "Id"
-done_table  = "done_songs"
+db_name = "karaoqueue"
+song_collection_name  = "songs"
+entry_collection_name = "entries"
+playback_collection_name  = "played"
 
 
 def dict_factory(cursor, row):
@@ -16,102 +18,99 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-def open_db():
-    conn = sqlite3.connect("data/test.db")
-    conn.execute('PRAGMA encoding = "UTF-8";')
-    return conn
+def open_db_client():
+    mongoClient = pymongo.MongoClient("mongodb://localhost:27017")
+    return mongoClient
 
 def import_songs(song_csv):
     print("Start importing Songs...")
-    df = pandas.read_csv(StringIO(song_csv), sep=';')
-    conn = open_db()
-    cur = conn.cursor()
-    df.to_sql(song_table, conn, if_exists='replace',
-              index=False)
-    cur.execute("SELECT Count(Id) FROM songs")
-    num_songs = cur.fetchone()[0]
-    conn.close()
+    client = open_db_client()
+    db = client[db_name]    
+    if not song_collection_name in db.list_collection_names():
+        songsCollection = db[song_collection_name]
+        songsCollection.create_index("karafun_id", unique=True)
+        songsCollection.create_index([("title","text"),("artist","text")])
+    else:
+        songsCollection = db[song_collection_name]
+    
+    def f(x): return (x.split(","))
+
+    df = pandas.read_csv(StringIO(song_csv), sep=';',
+                         engine='python', parse_dates=["Date Added"])
+    df.Styles = df.Styles.apply(f, convert_dtype=True)
+    df.Languages = df.Languages.apply(f, convert_dtype=True)
+    df.Duo = df.Duo.astype('bool')
+    df.Explicit = df.Explicit.astype('bool')
+    df.columns = map(str.lower, df.columns)
+    df.rename(columns={'id': 'karafun_id'}, inplace=True)
+    num_songs = df.shape[0]
+    song_dict = df.to_dict('records')
+    try:
+        songsCollection.insert_many(song_dict)
+    except pymongo.errors.BulkWriteError as bwe:
+        return(bwe.details)
+    finally:
+        client.close()
     print("Imported songs ({} in Database)".format(num_songs))
-    return("Imported songs ({} in Database)".format(num_songs)) 
-
-def create_entry_table():
-    conn = open_db()
-    conn.execute('CREATE TABLE IF NOT EXISTS '+entry_table +
-                 ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255))')
-    conn.close()
-
-
-def create_done_song_table():
-    conn = open_db()
-    conn.execute('CREATE TABLE IF NOT EXISTS '+done_table +
-                 ' (Song_Id INTEGER PRIMARY KEY NOT NULL,  Plays INTEGER)')
-    conn.close()
-
-def create_song_table():
-    conn = open_db()
-    conn.execute("CREATE TABLE IF NOT EXISTS \""+song_table+"""\" (
-        "Id" INTEGER,
-        "Title" TEXT,
-        "Artist" TEXT,
-        "Year" INTEGER,
-        "Duo" INTEGER,
-        "Explicit" INTEGER,
-        "Date Added" TEXT,
-        "Styles" TEXT,
-        "Languages" TEXT
-    )""")
-    conn.close()
-
-def create_list_view():
-    conn = open_db()
-    conn.execute("""CREATE VIEW IF NOT EXISTS [Liste] AS
-                 SELECT Name, Title, Artist, entries.Id, songs.Id
-                 FROM entries, songs
-                 WHERE entries.Song_Id=songs.Id""")
-    conn.close()
-
-
-def create_done_song_view():
-    conn = open_db()
-    conn.execute("""CREATE VIEW IF NOT EXISTS [Abspielliste] AS
-                 SELECT Artist || \" - \" || Title AS Song, Plays AS Wiedergaben
-                 FROM songs, done_songs
-                 WHERE done_songs.Song_Id=songs.Id""")
-    conn.close()
+    return("Imported songs ({} in Database)".format(num_songs))     
 
 def get_list():
-    conn = open_db()
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM Liste")
-    return cur.fetchall()
+    client = open_db_client()
+    db = client[db_name]
+    collection = db[entry_collection_name]
 
+    query = {}
+    cursor = collection.find()
+
+    result = {}
+
+    try:
+        for doc in cursor:
+            result += doc
+    finally:
+        client.close()
 
 def get_played_list():
-    conn = open_db()
+    conn = open_db_client()
     cur = conn.cursor()
     cur.execute("SELECT * FROM Abspielliste")
     return cur.fetchall()
 
 def get_song_list():
-    conn =open_db()
+    conn =open_db_client()
     cur = conn.cursor()
     cur.execute("SELECT Artist || \" - \" || Title AS Song, Id FROM songs;")
     return cur.fetchall()
 
 def get_song_completions(input_string):
-    conn = open_db()
-    conn.row_factory = dict_factory
-    cur = conn.cursor()
-    # Don't look, it burns...
-    prepared_string = "%{0}%".format(input_string).upper()  # "Test" -> "%TEST%"
-    print(prepared_string)
-    cur.execute(
-        "SELECT * FROM songs WHERE REPLACE(REPLACE(REPLACE(REPLACE(UPPER( Title ),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIKE (?) LIMIT 20;", (prepared_string,))
-    return cur.fetchall()
+    client = open_db_client()
+    db = client[db_name]
+    collection = db[song_collection_name]
+
+    cursor = collection.find({'$text': {'$search': input_string}}, {'_txtscr': {'$meta': 'textScore'}}, limit=30).sort([('_txtscr', {'$meta': 'textScore'})])
+
+    result = []
+
+    try:
+        for doc in cursor:
+            tmpdoc = doc
+            tmpdoc["_id"] = str(tmpdoc["_id"])
+            result.append(doc)
+    finally:
+        client.close()
+    # conn = open_db_client()
+    # conn.row_factory = dict_factory
+    # cur = conn.cursor()
+    # # Don't look, it burns...
+    # prepared_string = "%{0}%".format(input_string).upper()  # "Test" -> "%TEST%"
+    # print(prepared_string)
+    # cur.execute(
+    #     "SELECT * FROM songs WHERE REPLACE(REPLACE(REPLACE(REPLACE(UPPER( Title ),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIKE (?) LIMIT 20;", (prepared_string,))
+    print(result)
+    return result
 
 def add_entry(name,song_id):
-    conn = open_db()
+    conn = open_db_client()
     cur = conn.cursor()
     cur.execute(
         "INSERT INTO entries (Song_Id,Name) VALUES(?,?);", (song_id,name))
@@ -120,7 +119,7 @@ def add_entry(name,song_id):
     return
 
 def add_sung_song(entry_id):
-    conn = open_db()
+    conn = open_db_client()
     cur = conn.cursor()
     cur.execute("""SELECT Song_Id FROM entries WHERE Id=?""",(entry_id,))
     song_id = cur.fetchone()[0]
@@ -136,7 +135,7 @@ def add_sung_song(entry_id):
     return True
 
 def clear_played_songs():
-    conn = open_db()
+    conn = open_db_client()
     cur = conn.cursor()
     cur.execute("DELETE FROM done_songs")
     conn.commit()
@@ -144,7 +143,7 @@ def clear_played_songs():
     return True
 
 def delete_entry(id):
-    conn = open_db()
+    conn = open_db_client()
     cur = conn.cursor()
     cur.execute("DELETE FROM entries WHERE id=?",(id,))
     conn.commit()
@@ -157,7 +156,7 @@ def delete_entries(ids):
     for x in ids:
         idlist.append( (x,) )
     try:
-        conn = open_db()
+        conn = open_db_client()
         cur = conn.cursor()
         cur.executemany("DELETE FROM entries WHERE id=?", idlist)
         conn.commit()
@@ -167,7 +166,7 @@ def delete_entries(ids):
         return -1
 
 def delete_all_entries():
-    conn = open_db()
+    conn = open_db_client()
     cur = conn.cursor()
     cur.execute("DELETE FROM entries")
     conn.commit()
