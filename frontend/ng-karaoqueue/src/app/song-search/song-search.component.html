@@ -1,30 +1,48 @@
-<mat-form-field>
-  <mat-label>Suche...</mat-label>
-  <input matInput placeholder="Tippe einen Künstler oder Song..."
+<div class="content">
+  <mat-form-field class="search-input">
+    <mat-label>Suche...</mat-label>
+    <mat-icon matSuffix svgIcon="magnify"></mat-icon>
+    <input type="text" matInput placeholder="Tippe einen Künstler oder Song..."
     (keyup)="applyFilter($event.target.value)">
-</mat-form-field>
-<mat-list *ngFor="let song of songs">
-    <mat-card>
-      <mat-card-title>{{song.artist.name}} - {{song.title}}</mat-card-title>
-      <mat-card-content>
-        <ng-template [ngIf]="song.duet==true" [ngIfElse]="nonduet">
-          <mat-icon svgIcon="account-multiple"></mat-icon>
-        </ng-template>
-        <ng-template #nonduet>
-          <mat-icon svgIcon="account"></mat-icon>
-        </ng-template>
-        <ng-template [ngIf]="song.explicit==true" [ngIfElse]="nonexplicit">
-          <mat-icon svgIcon="alpha-e-box"></mat-icon>
-        </ng-template>
-        <ng-template #nonexplicit>
-          <mat-icon svgIcon="alpha-e-box" style="visibility: hidden;"></mat-icon>
-        </ng-template>
-        {{song.genres[0].name}}&nbsp;&nbsp;{{song.languages[0].name}}
-      </mat-card-content>
-      <button mat-flat-button color="accent">
-        <mat-icon svgIcon="playlist-plus"></mat-icon>
-      </button>
-      <mat-card-actions>
-      </mat-card-actions>
-    </mat-card>
-</mat-list>
+  </mat-form-field>
+  </div>
+  <div class="resultcontainer">
+    <mat-list *ngFor="let song of songs">
+        <mat-card class="result">
+          <div class="card-left">
+            <mat-card-title>{{song.artist}} - {{song.title}}</mat-card-title>
+            <div class="song-info">
+              <div class="info-icons">
+                <ng-template [ngIf]="song.duet==true" [ngIfElse]="nonduet">
+                  <mat-icon svgIcon="account-multiple"></mat-icon>
+                </ng-template>
+                <ng-template #nonduet>
+                  <mat-icon svgIcon="account"></mat-icon>
+                </ng-template>
+                <ng-template [ngIf]="song.explicit==true" [ngIfElse]="nonexplicit">
+                  <mat-icon svgIcon="alpha-e-box"></mat-icon>
+                </ng-template>
+                <ng-template #nonexplicit>
+                  <mat-icon svgIcon="alpha-e-box" class="icon-disabled"></mat-icon>
+                </ng-template>
+              </div>
+              <div class="genre-list">
+                <mat-icon svgIcon="music-circle"></mat-icon>
+                <mat-chip-list *ngFor="let genre of song.genres">
+                  <mat-chip>{{genre}}</mat-chip>
+                </mat-chip-list>
+              </div>
+              <div class="language-list">
+                <mat-icon svgIcon="account-voice"></mat-icon>
+                <mat-chip-list *ngFor="let language of song.languages">
+                  <mat-chip>{{language}}</mat-chip>
+                </mat-chip-list>
+              </div>
+            </div>
+          </div>
+          <button mat-flat-button color="accent" class="add-button">
+            <mat-icon svgIcon="playlist-plus"></mat-icon>
+          </button>
+        </mat-card>
+    </mat-list>
+  </div>

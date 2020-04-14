@@ -27,7 +27,7 @@ export class SongServiceService {
 
     this.http.get(this.api +"/songs/compl?search="+text).subscribe((data: Observable<JSON>) => {
       data.forEach(element => {
-        out.push(new Song(element["Title"],new Artist(42,element["Artist"]),element["Id"],element["Duo"],element["Explicit"],42,[new Genre(42,element["Styles"])],[new Language(42, element["Languages"])]));
+        out.push(new Song(element["title"],element["artist"],element["karafun_id"],element["duo"],element["explicit"],element["_id"],element["styles"],element["languages"]));
       });
     });
 
