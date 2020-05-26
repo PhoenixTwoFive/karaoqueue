@@ -5,43 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Flask",
-            "type": "python",
+            "type": "node",
             "request": "launch",
-            "module": "flask",
-            "preLaunchTask": "Launch MongoDB",
-            "env": {
-                "FLASK_APP": "app/main.py",
-                "FLASK_ENV": "development",
-                "FLASK_DEBUG": "0"
-            },
-            "args": [
-                "run",
-                "--no-debugger",
-                "--no-reload"
+            "name": "Launch via NPM",
+            "cwd": "${workspaceFolder}/karaoqueue-backend",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug"
             ],
-            "jinja": true,
-            "postDebugTask": "Stop MongoDB"
-        },
-        {
-            "name": "Python: Flask (open to world)",
-            "type": "python",
-            "request": "launch",
-            "module": "flask",
-            "preLaunchTask": "Launch MongoDB",
-            "env": {
-                "FLASK_APP": "app/main.py",
-                "FLASK_ENV": "development",
-                "FLASK_DEBUG": "0"
-            },
-            "args": [
-                "run",
-                "--no-debugger",
-                "--no-reload",
-                "--host=0.0.0.0"
+            "port": 9229,
+            "skipFiles": [
+                "<node_internals>/**"
             ],
-            "jinja": true,
-            "postDebugTask": "Stop MongoDB"
+            "preLaunchTask": "npm: build - karaoqueue-backend"
         }
     ]
 }

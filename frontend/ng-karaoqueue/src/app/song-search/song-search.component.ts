@@ -35,6 +35,9 @@ export class SongSearchComponent implements OnInit {
     ).subscribe((filterValue: string) => {
       this.updateSongs(filterValue);
     });
+
+    //Für Testzwecke
+    this.updateSongs("Test");
   }
 
 }

@@ -45,6 +45,15 @@
             "type": "shell",
             "command": "docker-compose -f ${workspaceFolder}/docker/docker-compose.dev.yml rm -sf",
             "problemMatcher": []
+        },
+        {
+            "type": "npm",
+            "script": "build",
+            "path": "karaoqueue-backend/",
+            "group": "build",
+            "problemMatcher": [],
+            "label": "npm: build - karaoqueue-backend",
+            "detail": "tsc"
         }
     ]
 }

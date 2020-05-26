@@ -1,0 +1,28 @@
+{
+  "name": "karaoqueue-backend",
+  "version": "0.0.1",
+  "description": "Backend for KaraoQueue",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
+    "debug": "node --nolazy --inspect-brk=9229 dist/index.js",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Phillip Kühne",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/express": "^4.17.6",
+    "@types/node": "^14.0.5",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "@types/mongodb": "^3.5.18",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "mongodb": "^3.5.7"
+  }
+}
