@@ -1,0 +1,392 @@
+openapi: 3.0.2
+info:
+  title: Karaoqueue API
+  version: '0.0.1'
+servers:
+  - url: 'http://localhost:3000/api'
+    description: Local Test sever instance
+  - url: 'https://karaoke.phillipathome.dynv6.net/api'
+    description: Production API    
+
+paths:
+  /queue:
+    get:
+      summary: 'Fetch entry Queue content'
+      description: 'Fetch entry Queue'
+      parameters:
+        - name: index
+          in: query
+          description: Position from which on to return results
+          required: false
+          schema: 
+            type: integer
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100, default 20)
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QueueEntry'
+        '400':
+          description: Invalid request. Check your parameters.
+        '404':
+          description: No Entries found in specified range.
+        '5XX':
+          description: Unexpected error.
+    post:
+      description: 'Add entry to Queue'
+      summary: 'Add entry to Queue'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                singer_name:
+                  type: string
+                song_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entry_id:
+                    type: string
+                    format: bson.ObjectID
+                    pattern: '/^[a-f\d]{24}$/i'
+                  entry_auth:
+                    type: string
+        '400':
+          description: Malformed request.
+        '405':
+          description: Currently not accepting entries.
+    delete:
+      summary: 'Clear queue'
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK. Successfully cleared Queue
+        '401':
+          description: Not Authorized
+      
+      description: clear queue
+  /queue/{entry_id}:
+    get:
+      summary: GET single queue entry
+      parameters:
+        - in: path
+          name: entry_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the Entry to get
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueueEntry'
+    patch:
+      summary: Change entry
+      security:
+        - cookieAuth: []      
+      parameters:
+        - in: path
+          name: entry_id
+          schema:
+            type: string
+            format: bson.ObjectID
+            pattern: '/^[a-f\d]{24}$/i'
+          required: true
+          description: >
+            ID of the entry to modify. One of the following is needed:
+              - Proper Bearer-Token authorization
+              - The entry_auth string corresponding to the entry
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: 
+              type: object
+              required:
+                - entry_auth
+              properties:
+                singer_name:
+                  type: string
+                song_id:
+                  type: integer
+                entry_auth:
+                  type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Entry not found
+        '405':
+          description: Method not allowed. Check your entry_auth or authorization.
+    delete:
+      summary: 'Delete entry'
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: entry_id
+          schema:
+            type: string
+            format: bson.ObjectID
+            pattern: '/^[a-f\d]{24}$/i'
+          required: true
+          description: >
+            ID of the entry to modify.  One of the following is needed:
+              - Proper Bearer-Token authorization
+              - The entry_auth string corresponding to the entry
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - entry_auth
+              properties:
+                entry_auth:
+                  type: string
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Entry not found
+        '405':
+          description: Method not allowed. Check your entry_auth or authorization.
+
+
+  /songs:
+    get:
+      summary: Search in Songs
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100, default 20)
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK. An array of Songs according to the Query string.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SongEntry'
+        '400':
+          description: Malformed Request
+    put:
+      summary: Update Song Database
+      description: >
+        Trigger an update of the database using the source CSV defined
+        in the config.
+      security:
+        - cookieAuth: []
+      responses:
+        '200': 
+          description: OK. Songs have been updated
+        '401':
+          description: Authorization required. Check your auth.
+  /statistics:
+    get:
+      summary: Statistics about the Database
+      responses:
+        '200':
+          description: Statistics as JSON
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  num_songs:
+                    type: integer
+                  num_entries:
+                    type: integer
+
+  /login:
+    post:
+      summary: Logs in and returns the authentication  cookie
+      requestBody:
+        required: true
+        description: A JSON object containing the login and password.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      security: []    # no authentication
+      responses:
+        '200':
+          description: >
+            Successfully authenticated.
+            The session ID is returned in a cookie named `connect.sid`. You need to include this cookie in subsequent requests.
+          headers: 
+            Set-Cookie:
+              schema: 
+                type: string
+                example: connect.sid=abcde12345; Path=/; HttpOnly
+  /logout:
+    get:
+      summary: Logs the user out and invalidates the session on the server
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+        '401':
+          description: Authorization required.
+
+  /rpc/end_event:
+    get:
+      summary: End the current event
+      description: Locks entries and does not allow reopening without reset
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+        
+  /rpc/start_event:
+    get:
+      summary: Start new event. Clears entries and stats.
+      description: Sets up a clean state.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+  
+  /rpc/enable_registration:
+    get:
+      summary: Enables registration in the queue
+      description: Makes it possible for guests to register in the queue.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+      
+    
+  /rpc/disable_registration:
+    get:
+      summary: Disables registration in the queue
+      description: Makes it impossible for guests to register in the queue.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+
+  /rpc/get_playstats:
+    get:
+      summary: Get stats of played songs in the current event.
+      description: Returns the stats for the current evening as JSON
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+
+  /rpc/download_playstats:
+    get:
+      summary: Get stats of played songs in the current event for download.
+      description: Returns the stats for the current evening as PDF (for example for GEMA)
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+
+  /rpc/entry_fulfilled:
+    get:
+      summary: Mark an entry as fulfilled.
+      description:  Mark an entry as fulfilled. This adds it to the statistics.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: OK.
+      parameters:
+        - in: query
+          name: entry_id
+          schema:
+            type: string
+          description: The id of the entry to mark as done.
+
+
+
+components:
+  securitySchemes:
+    cookieAuth:         # arbitrary name for the security scheme; will be used in the "security" key later
+      type: apiKey
+      in: cookie
+      name: connect.sid  # cookie name
+  schemas:
+    QueueEntry:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: bson.ObjectID
+          pattern: '/^[a-f\d]{24}$/i'
+        singer_name:
+          type: string
+        song_id:
+          type: integer
+    SongEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        artist:
+          type: string
+        year:
+          type: integer
+        duet:
+          type: boolean
+        explicit:
+          type: boolean
+        styles:
+          type: array
+          items:
+            type: string
+        languages:
+          type: array
+          items:
+            type: string
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+        
