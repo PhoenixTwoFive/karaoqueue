@@ -1,13 +1,15 @@
-import express = require("express");
+import "reflect-metadata";
+import { createExpressServer } from "routing-controllers";
+import { QueueController } from "./controllers/queue.controller";
+import { SongController } from "./controllers/songs.controller";
+import { StatisticsController } from "./controllers/statistics.controller";
+import { AuthenticationController } from "./controllers/auth.controller";
+import { RpcController } from "./controllers/rpc.controller";
 
-const app: express.Application = express();
+const app = createExpressServer({
+    routePrefix: "/api",
+    cors: true,
+    controllers: [QueueController, SongController, StatisticsController, AuthenticationController, RpcController]
+});
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-    // tslint:disable-next-line: no-console
-    console.log(req.headers["user-agent"]);
-});
-app.listen(3000, () => {
-    // tslint:disable-next-line: no-console
-    console.log('App is listening on port 3000!');
-});
+app.listen(3000);
