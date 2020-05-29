@@ -229,7 +229,7 @@ paths:
                   num_entries:
                     type: integer
 
-  /login:
+  /auth/login:
     post:
       summary: Logs in and returns the authentication  cookie
       requestBody:
@@ -250,7 +250,7 @@ paths:
               schema: 
                 type: string
                 example: connect.sid=abcde12345; Path=/; HttpOnly
-  /logout:
+  /auth/logout:
     get:
       summary: Logs the user out and invalidates the session on the server
       security:
