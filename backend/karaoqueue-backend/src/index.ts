@@ -6,10 +6,14 @@ import { StatisticsController } from "./controllers/statistics.controller";
 import { AuthenticationController } from "./controllers/auth.controller";
 import { RpcController } from "./controllers/rpc.controller";
 
+
+import * as dotenv from "dotenv";
+dotenv.config();
+
 const app = createExpressServer({
     routePrefix: "/api",
     cors: true,
     controllers: [QueueController, SongController, StatisticsController, AuthenticationController, RpcController]
 });
 
-app.listen(3000);
+app.listen(process.env.KQUEUE_PORT);
