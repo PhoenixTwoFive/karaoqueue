@@ -131,3 +131,7 @@ dmypy.json
 
 # Test data
 data/
+
+# Node Modules
+
+node_modules/
