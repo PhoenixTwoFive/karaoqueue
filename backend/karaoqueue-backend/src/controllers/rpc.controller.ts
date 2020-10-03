@@ -17,6 +17,7 @@ export class RpcController {
     @Get("/end_event")
     doEndEvent() {
         appState.currentlyInEvent = false;
+        appState.registrationEnabled = false;
         fs.unlinkSync("/tmp/.kqueue_eventlock");
         return 200;
     }
