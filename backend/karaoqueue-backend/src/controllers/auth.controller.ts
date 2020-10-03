@@ -17,15 +17,16 @@ export class AuthenticationController {
                 res.send("Welcome.")
                 return res;
             } else {
-                // TODO wrong password.
-                return "Wrong password."
+                res.status(401).send("Wrong user or password.");
+                return res;
             }
         } else {
-            // TODO wrong user.
-            return "Wrong user."
+            res.status(401).send("Wrong user or password.");
+            return res;
         }
     }
 
+    /* TODO Logout with JWT? */
     @Get("/logout")
     doLogout() {
         return "//TODO logout";

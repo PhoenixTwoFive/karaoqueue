@@ -1,4 +1,5 @@
-import { Get, QueryParam, JsonController, Put } from "routing-controllers";
+import { Get, QueryParam, JsonController, Put, Authorized } from "routing-controllers";
+
 
 @JsonController("/songs")
 export class SongController {
@@ -8,6 +9,7 @@ export class SongController {
     }
 
     @Put()
+    @Authorized()
     updateSongs() {
         return "//TODO update"
     }
