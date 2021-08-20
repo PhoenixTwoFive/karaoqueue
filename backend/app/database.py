@@ -10,7 +10,7 @@ index_label = "Id"
 done_table  = "done_songs"
 
 def open_db():
-    conn = sqlite3.connect("data/test.db")
+    conn = sqlite3.connect("/tmp/karaoqueue.db")
     conn.execute('PRAGMA encoding = "UTF-8";')
     return conn
 
