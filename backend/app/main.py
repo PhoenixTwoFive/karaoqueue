@@ -19,16 +19,39 @@ def home():
 
 @app.route('/api/enqueue', methods=['POST'])
 def enqueue():
-    if accept_entries:
-        if not request.json:
-            print(request.data)
-            abort(400)
-        name = request.json['name']
-        song_id = request.json['id']
-        database.add_entry(name, song_id)
-        return Response('{"status":"OK"}', mimetype='text/json')
+    if not request.json:
+        print(request.data) 
+        abort(400)
+    client_id = request.json['client_id']
+    if not helpers.is_valid_uuid(client_id):
+        print(request.data)
+        abort(400)
+    name = request.json['name']
+    song_id = request.json['id']
+    if request.authorization:
+                database.add_entry(name, song_id, client_id)
+                return Response('{"status":"OK"}', mimetype='text/json')
     else:
-        return Response('{"status":"Currently not accepting entries"}', mimetype='text/json',status=423)
+        if accept_entries:
+            if not request.json:
+                print(request.data) 
+                abort(400)
+            client_id = request.json['client_id']
+            if not helpers.is_valid_uuid(client_id):
+                print(request.data)
+                abort(400)
+            name = request.json['name']
+            song_id = request.json['id']
+            if database.check_queue_length() < app.config['MAX_QUEUE']:
+                if database.check_entry_quota(client_id) < app.config['ENTRY_QUOTA']:
+                    database.add_entry(name, song_id, client_id)
+                    return Response('{"status":"OK"}', mimetype='text/json')
+                else:
+                    return Response('{"status":"Too many queued entries from this client"}', mimetype='text/json',status=423)
+            else:
+                return Response('{"status":"Queue full"}', mimetype='text/json',status=423)
+        else:
+            return Response('{"status":"Currently not accepting entries"}', mimetype='text/json',status=423)
     
 
 @app.route("/list")

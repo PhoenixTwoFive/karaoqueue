@@ -4,15 +4,17 @@ import sqlite3
 import pandas
 from io import StringIO
 
-song_table  = "songs"
+song_table = "songs"
 entry_table = "entries"
 index_label = "Id"
-done_table  = "done_songs"
+done_table = "done_songs"
+
 
 def open_db():
     conn = sqlite3.connect("/tmp/karaoqueue.db")
     conn.execute('PRAGMA encoding = "UTF-8";')
     return conn
+
 
 def import_songs(song_csv):
     print("Start importing Songs...")
@@ -25,12 +27,13 @@ def import_songs(song_csv):
     num_songs = cur.fetchone()[0]
     conn.close()
     print("Imported songs ({} in Database)".format(num_songs))
-    return("Imported songs ({} in Database)".format(num_songs)) 
+    return("Imported songs ({} in Database)".format(num_songs))
+
 
 def create_entry_table():
     conn = open_db()
     conn.execute('CREATE TABLE IF NOT EXISTS '+entry_table +
-                 ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255))')
+                 ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255), Client_Id VARCHAR(36))')
     conn.close()
 
 
@@ -39,6 +42,7 @@ def create_done_song_table():
     conn.execute('CREATE TABLE IF NOT EXISTS '+done_table +
                  ' (Song_Id INTEGER PRIMARY KEY NOT NULL,  Plays INTEGER)')
     conn.close()
+
 
 def create_song_table():
     conn = open_db()
@@ -54,6 +58,7 @@ def create_song_table():
         "Languages" TEXT
     )""")
     conn.close()
+
 
 def create_list_view():
     conn = open_db()
@@ -72,6 +77,7 @@ def create_done_song_view():
                  WHERE done_songs.Song_Id=songs.Id""")
     conn.close()
 
+
 def get_list():
     conn = open_db()
     conn.row_factory = sqlite3.Row
@@ -86,35 +92,40 @@ def get_played_list():
     cur.execute("SELECT * FROM Abspielliste")
     return cur.fetchall()
 
+
 def get_song_list():
-    conn =open_db()
+    conn = open_db()
     cur = conn.cursor()
     cur.execute("SELECT Artist || \" - \" || Title AS Song, Id FROM songs;")
     return cur.fetchall()
+
 
 def get_song_completions(input_string):
     conn = open_db()
     cur = conn.cursor()
     # Don't look, it burns...
-    prepared_string = "%{0}%".format(input_string).upper()  # "Test" -> "%TEST%"
+    prepared_string = "%{0}%".format(
+        input_string).upper()  # "Test" -> "%TEST%"
     print(prepared_string)
     cur.execute(
         "SELECT Title || \" - \" || Artist AS Song, Id FROM songs WHERE REPLACE(REPLACE(REPLACE(REPLACE(UPPER( SONG ),'ö','Ö'),'ü','Ü'),'ä','Ä'),'ß','ẞ') LIKE (?) LIMIT 20;", (prepared_string,))
     return cur.fetchall()
 
-def add_entry(name,song_id):
+
+def add_entry(name, song_id, client_id):
     conn = open_db()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO entries (Song_Id,Name) VALUES(?,?);", (song_id,name))
+        "INSERT INTO entries (Song_Id,Name,Client_Id) VALUES(?,?,?);", (song_id, name, client_id))
     conn.commit()
     conn.close()
     return
 
+
 def add_sung_song(entry_id):
     conn = open_db()
     cur = conn.cursor()
-    cur.execute("""SELECT Song_Id FROM entries WHERE Id=?""",(entry_id,))
+    cur.execute("""SELECT Song_Id FROM entries WHERE Id=?""", (entry_id,))
     song_id = cur.fetchone()[0]
     cur.execute("""INSERT OR REPLACE INTO done_songs (Song_Id, Plays)
                 VALUES("""+str(song_id)+""",
@@ -127,6 +138,19 @@ def add_sung_song(entry_id):
     conn.close()
     return True
 
+
+def check_entry_quota(client_id):
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute("SELECT Count(*) FROM entries WHERE entries.Client_Id = ?", (client_id,))
+    return cur.fetchall()[0][0]
+
+def check_queue_length():
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute("SELECT Count(*) FROM entries")
+    return cur.fetchall()[0][0]
+
 def clear_played_songs():
     conn = open_db()
     cur = conn.cursor()
@@ -135,10 +159,11 @@ def clear_played_songs():
     conn.close()
     return True
 
+
 def delete_entry(id):
     conn = open_db()
     cur = conn.cursor()
-    cur.execute("DELETE FROM entries WHERE id=?",(id,))
+    cur.execute("DELETE FROM entries WHERE id=?", (id,))
     conn.commit()
     conn.close()
     return True
@@ -147,7 +172,7 @@ def delete_entry(id):
 def delete_entries(ids):
     idlist = []
     for x in ids:
-        idlist.append( (x,) )
+        idlist.append((x,))
     try:
         conn = open_db()
         cur = conn.cursor()
@@ -157,6 +182,7 @@ def delete_entries(ids):
         return cur.rowcount
     except sqlite3.Error as error:
         return -1
+
 
 def delete_all_entries():
     conn = open_db()

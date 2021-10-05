@@ -17,8 +17,8 @@
                 </button>
             </div>
             <div class="form-group">
-            <form id="nameForm">
-                <div class="modal-body">
+                <form id="nameForm">
+                    <div class="modal-body">
                         <label for="singerNameInput">Sängername</label>
                         <input type="text" class="form-control" id="singerNameInput" placeholder="Max Mustermann"
                             required>
@@ -28,7 +28,7 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" id="submitSongButton">Anmelden</button>
                     </div>
-            </form>
+                </form>
             </div>
         </div>
     </div>
@@ -38,22 +38,22 @@
 <script>
     $(document).ready(function () {
         $("#filter").focus();
-        $("#filter").keyup( function () {
+        $("#filter").keyup(function () {
             var value = $(this).val().toLowerCase();
             //alert(value);
-            if(value.length >= 1) {
+            if (value.length >= 1) {
                 $.getJSON("/api/songs/compl", { search: value }, function (data) {
                     var items = [];
                     $.each(data, function (key, val) {
-                        items.push("<tr><td>"+val[0]+`</td>
+                        items.push("<tr><td>" + val[0] + `</td>
                             <td><button type='button'
                                     class='btn btn-primary justify-content-center align-content-between enqueueButton'
                                     data-toggle='modal'
-                                    data-target='#enqueueModal' onclick='setSelectedId(`+val[1]+`)'><i
+                                    data-target='#enqueueModal' onclick='setSelectedId(`+ val[1] + `)'><i
                                         class="fas fa-plus"></i></button></td>
                         </tr>`)
                     });
-    
+
                     $("#songtable").html("")
                     $(items.join("")).appendTo("#songtable");
                     entriesAccepted()
@@ -63,17 +63,18 @@
             }
         });
 
-        $("#nameForm").submit( function (e) {
+        $("#nameForm").submit(function (e) {
             e.preventDefault();
             submitModal();
         });
     });
 
-    
-    function enqueue(id,name,success_callback, blocked_callback) {
+
+    function enqueue(client_id, id, name, success_callback, blocked_callback) {
         var data = {
             "name": name,
-            "id": id
+            "id": id,
+            "client_id": client_id
         }
         $.ajax({
             type: 'POST',
@@ -87,41 +88,41 @@
             dataType: 'json'
         });
     }
-    
+
     function setSelectedId(id) {
-        $("#selectedId").attr("value",id);
+        $("#selectedId").attr("value", id);
     }
-    
+
     function submitModal() {
         var name = $("#singerNameInput").val();
         var id = $("#selectedId").attr("value");
-        enqueue(id,name,function () {
+        enqueue(localStorage.getItem("clientId"),id, name, function () {
             $("#enqueueModal").modal('hide');
             window.location.href = '/#end';
-        }, function () {
+        }, function (response) {
             bootbox.alert({
-                    message: "Es werden leider keine neuen Anmeldungen mehr angenommen. Tut mir leid :(",
-                });
-            $(".enqueueButton").prop("disabled",true);
+                message: "Deine Eintragung konnte leider nicht vorgenommen werden.\nReason: "+response.responseJSON.status,
+            });
+            entriesAccepted();
             $("#enqueueModal").modal('hide');
 
         });
-        
+
 
     }
 
     function entriesAccepted() {
-        $.getJSON("/api/entries/accept", (data,out) => {
-            if(data["value"]==0) {
-                $(".enqueueButton").prop("disabled",true)
-                $(".enqueueButton").prop("style","pointer-events: none;")
-                $(".enqueueButton").wrap("<span class='tooltip-span' tabindex='0' data-toggle='tooltip' data-placement='top'></span>" );
-                $(".tooltip-span").prop("title","Eintragungen sind leider nicht mehr möglich.")
+        $.getJSON("/api/entries/accept", (data, out) => {
+            if (data["value"] == 0) {
+                $(".enqueueButton").prop("disabled", true)
+                $(".enqueueButton").prop("style", "pointer-events: none;")
+                $(".enqueueButton").wrap("<span class='tooltip-span' tabindex='0' data-toggle='tooltip' data-placement='top'></span>");
+                $(".tooltip-span").prop("title", "Eintragungen sind leider nicht mehr möglich.")
                 $('[data-toggle="tooltip"]').tooltip()
             } else {
-                $(".enqueueButton").prop("disabled",false)
+                $(".enqueueButton").prop("disabled", false)
             }
-            
+
         })
     }
 
