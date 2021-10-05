@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Einstellungen{% endblock %}
+{% block content %}
+<form method="post">
+    <p>
+        <input type="number" id="entryquota" name="entryquota" min=1 value={{app.config['ENTRY_QUOTA']}}>
+        <label for="entryquota">Maximale Anzahl an Einträgen pro Nutzer</label>
+    </p>
+    <p>
+        <input type="number" id="maxqueue" name="maxqueue" min=1 value={{app.config['MAX_QUEUE']}}>
+        <label for="maxqueue">Maximale Anzahl an Einträgen Insgesamt</label>
+    </p>
+    <input type="submit" value="Einstellungen anwenden">
+    <input type="button" onclick="$.get('/writeSettings').done(()=>{alert('Einstellungen gespeichert')}).fail(()=>{alert('Fehler beim Speichern der Einstellungen')})" value="Einstellungen speichern"/>
+</form>
+{% endblock %}
+{% block extrajs %}
+{% endblock %}

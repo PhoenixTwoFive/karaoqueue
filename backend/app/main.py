@@ -2,13 +2,15 @@ from flask import Flask, render_template, Response, abort, request, redirect
 import helpers
 import database
 import data_adapters
-import os, errno
+import os
+import errno
 import json
 from flask_basicauth import BasicAuth
 app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
 accept_entries = False
+
 
 @app.route("/")
 def home():
@@ -17,10 +19,11 @@ def home():
     else:
         return render_template('main.html', list=database.get_list(), auth=basic_auth.authenticate())
 
+
 @app.route('/api/enqueue', methods=['POST'])
 def enqueue():
     if not request.json:
-        print(request.data) 
+        print(request.data)
         abort(400)
     client_id = request.json['client_id']
     if not helpers.is_valid_uuid(client_id):
@@ -29,12 +32,12 @@ def enqueue():
     name = request.json['name']
     song_id = request.json['id']
     if request.authorization:
-                database.add_entry(name, song_id, client_id)
-                return Response('{"status":"OK"}', mimetype='text/json')
+        database.add_entry(name, song_id, client_id)
+        return Response('{"status":"OK"}', mimetype='text/json')
     else:
         if accept_entries:
             if not request.json:
-                print(request.data) 
+                print(request.data)
                 abort(400)
             client_id = request.json['client_id']
             if not helpers.is_valid_uuid(client_id):
@@ -47,45 +50,73 @@ def enqueue():
                     database.add_entry(name, song_id, client_id)
                     return Response('{"status":"OK"}', mimetype='text/json')
                 else:
-                    return Response('{"status":"Too many queued entries from this client"}', mimetype='text/json',status=423)
+                    return Response('{"status":"Du hast bereits ' + str(database.check_entry_quota(client_id)) + ' Songs eingetragen, dies ist das Maximum an Einträgen die du in der Warteliste haben kannst."}', mimetype='text/json', status=423)
             else:
-                return Response('{"status":"Queue full"}', mimetype='text/json',status=423)
+                return Response('{"status":"Die Warteschlange enthält momentan ' + str(database.check_queue_length()) + ' Einträge und ist lang genug, bitte versuche es noch einmal wenn ein paar Songs gesungen wurden."}', mimetype='text/json', status=423)
         else:
-            return Response('{"status":"Currently not accepting entries"}', mimetype='text/json',status=423)
-    
+            return Response('{"status":"Currently not accepting entries"}', mimetype='text/json', status=423)
+
 
 @app.route("/list")
 def songlist():
     return render_template('songlist.html', list=database.get_song_list(), auth=basic_auth.authenticate())
+
+
+@app.route("/settings")
+@basic_auth.required
+def settings():
+    return render_template('settings.html', app=app, auth=basic_auth.authenticate())
+
+
+@app.route("/settings", methods=['POST'])
+@basic_auth.required
+def settings_post():
+    entryquota = request.form.get("entryquota")
+    maxqueue = request.form.get("maxqueue")
+    if entryquota.isnumeric() and int(entryquota) > 0:
+        app.config['ENTRY_QUOTA'] = entryquota
+    else:
+        abort(400)
+    if maxqueue.isnumeric and int(maxqueue) > 0:
+        app.config['MAX_QUEUE'] = maxqueue
+    else:
+        abort(400)
+
+    return render_template('settings.html', app=app, auth=basic_auth.authenticate())
+
 
 @app.route("/api/queue")
 def queue_json():
     list = data_adapters.dict_from_rows(database.get_list())
     return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
+
 @app.route("/plays")
 @basic_auth.required
 def played_list():
     return render_template('played_list.html', list=database.get_played_list(), auth=basic_auth.authenticate())
+
 
 @app.route("/api/songs")
 def songs():
     list = database.get_song_list()
     return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
+
 @app.route("/api/songs/update")
 @basic_auth.required
 def update_songs():
     database.delete_all_entries()
-    status = database.import_songs(helpers.get_songs(helpers.get_catalog_url()))
+    status = database.import_songs(
+        helpers.get_songs(helpers.get_catalog_url()))
     print(status)
     return Response('{"status": "%s" }' % status, mimetype='text/json')
 
 
 @app.route("/api/songs/compl")
 def get_song_completions(input_string=""):
-    input_string = request.args.get('search',input_string)
-    if input_string!="":
+    input_string = request.args.get('search', input_string)
+    if input_string != "":
         print(input_string)
         list = database.get_song_completions(input_string=input_string)
         return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
@@ -125,12 +156,13 @@ def mark_sung(entry_id):
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
 
+
 @app.route("/api/entries/accept/<value>")
 @basic_auth.required
 def set_accept_entries(value):
     global accept_entries
-    if (value=='0' or value=='1'):
-        accept_entries=bool(int(value))
+    if (value == '0' or value == '1'):
+        accept_entries = bool(int(value))
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
@@ -140,7 +172,7 @@ def set_accept_entries(value):
 def get_accept_entries():
     global accept_entries
     return Response('{"status": "OK", "value": '+str(int(accept_entries))+'}', mimetype='text/json')
-    
+
 
 @app.route("/api/played/clear")
 @basic_auth.required
@@ -150,6 +182,7 @@ def clear_played_songs():
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
 
+
 @app.route("/api/entries/delete_all")
 @basic_auth.required
 def delete_all_entries():
@@ -158,10 +191,12 @@ def delete_all_entries():
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
 
+
 @app.route("/login")
 @basic_auth.required
 def admin():
     return redirect("/", code=303)
+
 
 @app.before_first_request
 def activate_job():
@@ -174,5 +209,5 @@ def activate_job():
     helpers.setup_config(app)
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8080, debug=True)
