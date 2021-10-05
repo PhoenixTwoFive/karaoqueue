@@ -1,5 +1,9 @@
 runtime: python39
 
+manual_scaling:
+  # Das ist alles bloß dumm schnell zusammengehackt...
+  instances: 1
+
 handlers:
   # This configures Google App Engine to serve the files in the app's static
   # directory.
