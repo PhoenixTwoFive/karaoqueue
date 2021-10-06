@@ -74,11 +74,11 @@ def settings_post():
     entryquota = request.form.get("entryquota")
     maxqueue = request.form.get("maxqueue")
     if entryquota.isnumeric() and int(entryquota) > 0:
-        app.config['ENTRY_QUOTA'] = entryquota
+        app.config['ENTRY_QUOTA'] = int(entryquota)
     else:
         abort(400)
     if maxqueue.isnumeric and int(maxqueue) > 0:
-        app.config['MAX_QUEUE'] = maxqueue
+        app.config['MAX_QUEUE'] = int(maxqueue)
     else:
         abort(400)
 
