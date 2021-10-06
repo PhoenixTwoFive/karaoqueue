@@ -101,7 +101,7 @@
             window.location.href = '/#end';
         }, function (response) {
             bootbox.alert({
-                message: "Deine Eintragung konnte leider nicht vorgenommen werden.\nReason: "+response.responseJSON.status,
+                message: "Deine Eintragung konnte leider nicht vorgenommen werden.\nGrund: "+response.responseJSON.status,
             });
             entriesAccepted();
             $("#enqueueModal").modal('hide');
