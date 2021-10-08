@@ -32,6 +32,17 @@ def is_valid_uuid(val):
 def check_config_exists():
     return os.path.isfile(config_file)
 
+def load_version(app):
+    if os.path.isfile(".version"):
+        with open('.version', 'r') as file:
+            data = file.read().replace('\n', '')
+            if data:
+                app.config['VERSION'] = data
+            else:
+                app.config['VERSION'] = ""
+    else:
+        app.config['VERSION'] = ""
+
 def setup_config(app):
     if check_config_exists():
         config = json.load(open(config_file))

@@ -200,6 +200,7 @@ def admin():
 
 @app.before_first_request
 def activate_job():
+    helpers.load_version(app)
     helpers.create_data_directory()
     database.create_entry_table()
     database.create_song_table()
@@ -207,6 +208,10 @@ def activate_job():
     database.create_list_view()
     database.create_done_song_view()
     helpers.setup_config(app)
+
+@app.context_processor
+def inject_version():
+    return dict(karaoqueue_version=app.config['VERSION'])
 
 
 if __name__ == "__main__":

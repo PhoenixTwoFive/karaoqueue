@@ -135,3 +135,6 @@ data/
 # Node Modules
 
 node_modules/
+
+# Version identification file
+.version
