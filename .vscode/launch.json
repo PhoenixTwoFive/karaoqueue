@@ -27,6 +27,7 @@
             "preLaunchTask": "versiondump",
             "name": "Python: Flask (with reload)",
             "type": "python",
+            "cwd": "${workspaceFolder}/backend/app",
             "request": "launch",
             "module": "flask",
             "env": {
@@ -44,6 +45,7 @@
             "preLaunchTask": "versiondump",
             "name": "Python: Flask (with reload, externally reachable)",
             "type": "python",
+            "cwd": "${workspaceFolder}/backend/app",
             "request": "launch",
             "module": "flask",
             "env": {
@@ -54,7 +56,7 @@
             "args": [
                 "run",
                 "--no-debugger",
-                "--host='0.0.0.0'"
+                "--host=0.0.0.0"
             ],
             "jinja": true
         },
@@ -62,6 +64,7 @@
             "preLaunchTask": "versiondump",
             "name": "Python: Flask (externally reachable)",
             "type": "python",
+            "cwd": "${workspaceFolder}/backend/app",
             "request": "launch",
             "module": "flask",
             "env": {
@@ -73,7 +76,7 @@
                 "run",
                 "--no-debugger",
                 "--no-reload",
-                "--host='0.0.0.0'"
+                "--host=0.0.0.0"
             ],
             "jinja": true
         },
