@@ -116,10 +116,10 @@ table td:nth-child(2) {
         $.getJSON("/api/entries/accept", (data) => {
             if (data["value"]!=$('#entryToggle').is(":checked")) {
                 if(data["value"]==1) {
-                $('#entryToggle').bootstrapToggle('on')
+                    $('#entryToggle').data('bs.toggle').on('true')
                 }
                 else {
-                    $('#entryToggle').bootstrapToggle('off')
+                    $('#entryToggle').data('bs.toggle').off('true')
                 }
             }
         })

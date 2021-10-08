@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+import uuid
 
 data_directory = "data"
 config_file = data_directory+"/config.json"
@@ -21,6 +22,13 @@ def get_songs(url):
     r = requests.get(url)
     return r.text
 
+def is_valid_uuid(val):
+    try:
+        uuid.UUID(str(val))
+        return True
+    except ValueError:
+        return False
+
 def check_config_exists():
     return os.path.isfile(config_file)
 
@@ -31,9 +39,11 @@ def setup_config(app):
             config = json.load(handle)
         print("Loaded existing config")
     else:
-        config = {'username': 'admin', 'password': 'changeme'}
+        config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20}
         with open(config_file, 'w') as handle:
             json.dump(config, handle, indent=4, sort_keys=True)
         print("Wrote new config")
     app.config['BASIC_AUTH_USERNAME'] = config['username']
     app.config['BASIC_AUTH_PASSWORD'] = config['password']
+    app.config['ENTRY_QUOTA'] = config['entryquota']
+    app.config['MAX_QUEUE'] = config['maxqueue']
