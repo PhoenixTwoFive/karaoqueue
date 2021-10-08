@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import json
 import os
 import uuid
+from flask import make_response
+from functools import wraps, update_wrapper
+from datetime import datetime
 
 data_directory = "data"
 config_file = data_directory+"/config.json"
@@ -58,3 +61,17 @@ def setup_config(app):
     app.config['BASIC_AUTH_PASSWORD'] = config['password']
     app.config['ENTRY_QUOTA'] = config['entryquota']
     app.config['MAX_QUEUE'] = config['maxqueue']
+
+
+
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Last-Modified'] = datetime.now()
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+        
+    return update_wrapper(no_cache, view)

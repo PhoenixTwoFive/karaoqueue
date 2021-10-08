@@ -3,14 +3,13 @@ import helpers
 import database
 import data_adapters
 import os
-import errno
 import json
 from flask_basicauth import BasicAuth
+from helpers import nocache
 app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
 accept_entries = False
-
 
 @app.route("/")
 def home():
@@ -27,6 +26,7 @@ def favicon():
 
 
 @app.route('/api/enqueue', methods=['POST'])
+@nocache
 def enqueue():
     if not request.json:
         print(request.data)
@@ -69,12 +69,14 @@ def songlist():
 
 
 @app.route("/settings")
+@nocache
 @basic_auth.required
 def settings():
     return render_template('settings.html', app=app, auth=basic_auth.authenticate())
 
 
 @app.route("/settings", methods=['POST'])
+@nocache
 @basic_auth.required
 def settings_post():
     entryquota = request.form.get("entryquota")
@@ -92,24 +94,28 @@ def settings_post():
 
 
 @app.route("/api/queue")
+@nocache
 def queue_json():
     list = data_adapters.dict_from_rows(database.get_list())
     return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
 
 @app.route("/plays")
+@nocache
 @basic_auth.required
 def played_list():
     return render_template('played_list.html', list=database.get_played_list(), auth=basic_auth.authenticate())
 
 
 @app.route("/api/songs")
+@nocache
 def songs():
     list = database.get_song_list()
     return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
 
 
 @app.route("/api/songs/update")
+@nocache
 @basic_auth.required
 def update_songs():
     database.delete_all_entries()
@@ -120,6 +126,7 @@ def update_songs():
 
 
 @app.route("/api/songs/compl")
+@nocache
 def get_song_completions(input_string=""):
     input_string = request.args.get('search', input_string)
     if input_string != "":
@@ -132,6 +139,7 @@ def get_song_completions(input_string=""):
 
 
 @app.route("/api/entries/delete/<entry_id>")
+@nocache
 @basic_auth.required
 def delete_entry(entry_id):
     if database.delete_entry(entry_id):
@@ -141,6 +149,7 @@ def delete_entry(entry_id):
 
 
 @app.route("/api/entries/delete", methods=['POST'])
+@nocache
 @basic_auth.required
 def delete_entries():
     if not request.json:
@@ -155,6 +164,7 @@ def delete_entries():
 
 
 @app.route("/api/entries/mark_sung/<entry_id>")
+@nocache
 @basic_auth.required
 def mark_sung(entry_id):
     if database.add_sung_song(entry_id):
@@ -164,6 +174,7 @@ def mark_sung(entry_id):
 
 
 @app.route("/api/entries/accept/<value>")
+@nocache
 @basic_auth.required
 def set_accept_entries(value):
     global accept_entries
@@ -175,12 +186,14 @@ def set_accept_entries(value):
 
 
 @app.route("/api/entries/accept")
+@nocache
 def get_accept_entries():
     global accept_entries
     return Response('{"status": "OK", "value": '+str(int(accept_entries))+'}', mimetype='text/json')
 
 
 @app.route("/api/played/clear")
+@nocache
 @basic_auth.required
 def clear_played_songs():
     if database.clear_played_songs():
@@ -190,6 +203,7 @@ def clear_played_songs():
 
 
 @app.route("/api/entries/delete_all")
+@nocache
 @basic_auth.required
 def delete_all_entries():
     if database.delete_all_entries():
@@ -223,7 +237,8 @@ def add_header(response):
     Add headers to both force latest IE rendering engine or Chrome Frame,
     and also to cache the rendered page for 10 minutes.
     """
-    response.headers['Cache-Control'] = 'private, max-age=600'
+    if not 'Cache-Control' in response.headers:
+        response.headers['Cache-Control'] = 'private, max-age=600'
     return response
 
 @app.context_processor
