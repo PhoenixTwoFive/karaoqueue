@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, abort, request, redirect
+from flask import Flask, render_template, Response, abort, request, redirect, send_from_directory
 import helpers
 import database
 import data_adapters
@@ -18,6 +18,12 @@ def home():
         return render_template('main_admin.html', list=database.get_list(), auth=basic_auth.authenticate())
     else:
         return render_template('main.html', list=database.get_list(), auth=basic_auth.authenticate())
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/api/enqueue', methods=['POST'])
@@ -208,6 +214,17 @@ def activate_job():
     database.create_list_view()
     database.create_done_song_view()
     helpers.setup_config(app)
+
+
+
+@app.after_request
+def add_header(response):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    response.headers['Cache-Control'] = 'private, max-age=600'
+    return response
 
 @app.context_processor
 def inject_version():

@@ -6,8 +6,8 @@
     "background_color": "#343a40",
     "description": "Eine Karaokewarteliste.",
     "icons": [{
-        "src": "images/touch/homescreen192.png",
-        "sizes": "192x192",
+        "src": "images/touch/homescreen512.png",
+        "sizes": "512x512",
         "type": "image/png"
     }],
     "related_applications": [{
