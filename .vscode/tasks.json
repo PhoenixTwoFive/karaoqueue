@@ -6,7 +6,7 @@
         {
             "label": "versiondump",
             "type": "shell",
-            "command": "git describe > ${workspaceFolder}/backend/app/.version",
+            "command": "echo \"$(git rev-parse --abbrev-ref HEAD)-$(git describe)\"> ${workspaceFolder}/backend/app/.version",
             "problemMatcher": []
         }
     ]
