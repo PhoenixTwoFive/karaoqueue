@@ -33,7 +33,7 @@ def import_songs(song_csv):
 def create_entry_table():
     conn = open_db()
     conn.execute('CREATE TABLE IF NOT EXISTS '+entry_table +
-                 ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255), Client_Id VARCHAR(36))')
+                 ' (ID INTEGER PRIMARY KEY NOT NULL, Song_Id INTEGER NOT NULL, Name VARCHAR(255), Client_Id VARCHAR(36), Transferred INTEGER DEFAULT 0)')
     conn.close()
 
 
@@ -63,7 +63,7 @@ def create_song_table():
 def create_list_view():
     conn = open_db()
     conn.execute("""CREATE VIEW IF NOT EXISTS [Liste] AS
-                 SELECT Name, Title, Artist, entries.Id, songs.Id
+                 SELECT Name, Title, Artist, entries.Id, songs.Id, entries.Transferred
                  FROM entries, songs
                  WHERE entries.Song_Id=songs.Id""")
     conn.close()
@@ -139,17 +139,36 @@ def add_sung_song(entry_id):
     return True
 
 
+def toggle_transferred(entry_id):
+    conn = open_db()
+    cur = conn.cursor()
+    cur.execute("SELECT Transferred FROM entries WHERE ID =?", (entry_id,))
+    marked = cur.fetchall()[0][0]
+    if(marked == 0):
+        cur.execute(
+            "UPDATE entries SET Transferred = 1 WHERE ID =?", (entry_id,))
+    else:
+        cur.execute(
+            "UPDATE entries SET Transferred = 0 WHERE ID =?", (entry_id,))
+    conn.commit()
+    conn.close()
+    return True
+
+
 def check_entry_quota(client_id):
     conn = open_db()
     cur = conn.cursor()
-    cur.execute("SELECT Count(*) FROM entries WHERE entries.Client_Id = ?", (client_id,))
+    cur.execute(
+        "SELECT Count(*) FROM entries WHERE entries.Client_Id = ?", (client_id,))
     return cur.fetchall()[0][0]
+
 
 def check_queue_length():
     conn = open_db()
     cur = conn.cursor()
     cur.execute("SELECT Count(*) FROM entries")
     return cur.fetchall()[0][0]
+
 
 def clear_played_songs():
     conn = open_db()

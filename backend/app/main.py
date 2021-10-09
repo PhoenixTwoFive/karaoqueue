@@ -172,6 +172,15 @@ def mark_sung(entry_id):
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
 
+@app.route("/api/entries/mark_transferred/<entry_id>")
+@nocache
+@basic_auth.required
+def mark_transferred(entry_id):
+    if database.toggle_transferred(entry_id):
+        return Response('{"status": "OK"}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json')
+
 
 @app.route("/api/entries/accept/<value>")
 @nocache

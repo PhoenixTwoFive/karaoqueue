@@ -111,6 +111,7 @@
 
     }
 
+    {% if not auth %}
     function entriesAccepted() {
         $.getJSON("/api/entries/accept", (data, out) => {
             if (data["value"] == 0) {
@@ -125,6 +126,11 @@
 
         })
     }
+    {% else %}
+    function entriesAccepted() {
+        $(".enqueueButton").prop("disabled", false)
+    }
+    {% endif %}
 
 </script>
 {% endblock %}
