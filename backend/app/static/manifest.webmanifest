@@ -1,0 +1,17 @@
+{
+    "name": "KaraoQueue",
+    "short_name": "KaraoQueue",
+    "start_url": "/",
+    "url": "https://karaoqueue-323511.appspot.com/",
+    "display": "standalone",
+    "background_color": "#343a40",
+    "description": "Eine Karaokewarteliste.",
+    "icons": [{
+        "src": "images/touch/homescreen512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+    }],
+    "related_applications": [{
+        "platform": "Web"
+    }]
+}

@@ -1,0 +1,4 @@
+requests
+pandas
+Flask-BasicAuth
+bs4

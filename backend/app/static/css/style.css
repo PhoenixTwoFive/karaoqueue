@@ -1,0 +1,77 @@
+body {
+    padding-top: 5rem;
+}
+
+html, body {
+    height: 100%;
+}
+
+.site {
+    height: auto;
+    min-height: 100%;
+}
+
+main {
+    padding-bottom: 60px; /* Höhe des Footers */
+}
+
+.footer {
+    margin-top: -60px;
+    width: 100%;
+    height: 60px;
+    /* Set the fixed height of the footer here */
+    /*line-height: 60px; /* Vertically center the text there */
+    background-color: #f5f5f5;
+}
+
+.topbutton {
+    width: 100%;
+}
+
+table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+table.entries tbody tr[data-index="0"] {
+    background-color: #007bff80;
+    font-weight: 600;
+}
+
+table.entries tbody tr[data-index="1"] {
+    background-color: #007bff40;
+    font-weight: 500;
+}
+
+table.entries tbody tr[data-index="2"] {
+    background-color: #007bff20;
+    font-weight: 400;
+}
+
+table.entries tbody tr[data-index="3"] {
+    background-color: #007bff10;
+}
+
+table td:first-child {
+    max-width: 200px !important;
+}
+
+@media (min-width: 768px) {
+    .topbutton {
+        width: auto;
+    }
+}
+
+@media print {
+    body {
+        font-size: 1.3em;
+    }
+
+    .footer {
+        display: none !important;
+    }
+
+    .admincontrols {
+        display: none;
+    }
+}
