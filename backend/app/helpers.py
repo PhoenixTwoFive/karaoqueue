@@ -18,7 +18,7 @@ def create_data_directory():
 def get_catalog_url():
     r = requests.get('https://www.karafun.de/karaoke-song-list.html')
     soup = BeautifulSoup(r.content, 'html.parser')
-    url = soup.findAll('a', href=True, text='Available in CSV format')[0]['href']
+    url = soup.findAll('a', href=True, text='Verfügbar in CSV-Format')[0]['href']
     return url
 
 def get_songs(url):
