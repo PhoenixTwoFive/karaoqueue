@@ -18,6 +18,7 @@ connection = None
 def open_db() -> engine.base.Connection:
     global connection
     if (not connection):
+        print(current_app.config.get("DBCONNSTRING"))
         engine = create_engine(current_app.config.get("DBCONNSTRING"))
         connection = engine.connect()
     # cur.execute('PRAGMA encoding = "UTF-8";')
