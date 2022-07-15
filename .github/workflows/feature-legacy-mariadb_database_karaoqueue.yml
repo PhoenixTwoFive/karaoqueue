@@ -30,7 +30,7 @@ jobs:
       - name: Install mariadb
         run: |
           sudo apt-get remove --purge mysql-server mysql-client mysql-common libmysqlclient-dev
-          sudo sudo apt install -y libmariadbclient-dev python3-dev
+          sudo sudo apt install -y libmariadbd-dev python3-dev
 
       
       - name: Install dependencies
