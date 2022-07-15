@@ -28,7 +28,7 @@ jobs:
           source venv/bin/activate
       
       - name: Install mysql
-        run: sudo sudo aptitude install -y mariadb-server
+        run: sudo sudo apt install -y mariadb-server
 
       
       - name: Install dependencies
