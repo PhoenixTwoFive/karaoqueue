@@ -28,7 +28,7 @@ jobs:
           source venv/bin/activate
       
       - name: Install mysql
-        run: sudo sudo apt install -y mysql-server libmysqlclient-dev libmariadbclient-dev
+        run: sudo sudo apt install -y mysql-server libmysqlclient-dev
 
       
       - name: Install dependencies
