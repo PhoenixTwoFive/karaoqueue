@@ -3,7 +3,6 @@
 from email.mime import base
 from MySQLdb import Connection
 from sqlalchemy import create_engine, engine
-import mariadb
 import pandas
 from io import StringIO
 from flask import current_app
@@ -191,7 +190,7 @@ def delete_entries(ids):
         cur = conn.execute("DELETE FROM entries WHERE id=?", idlist)
         # conn.close()
         return cur.rowcount
-    except mariadb.Error as error:
+    except Exception as error:
         return -1
 
 
