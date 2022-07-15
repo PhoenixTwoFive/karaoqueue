@@ -14,7 +14,8 @@
             "env": {
                 "FLASK_APP": "backend/app.py",
                 "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1"
+                "FLASK_DEBUG": "1", 
+                "DBSTRING": "mysql://ek0ur6p6ky9gdmif:kpmi2bav4mvh4jbx@eporqep6b4b8ql12.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/xdfmpudc3remzgj0"
             },
             "args": [
                 "run",

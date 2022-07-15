@@ -49,17 +49,23 @@ def load_version(app):
         app.config['VERSION'] = ""
         
 def load_dbconfig(app):
-    if os.environ.get("JAWSDB_MARIA_URL"):
-        app.config['VERSION'] = os.environ.get("JAWSDB_MARIA_URL")
-    elif os.path.isfile(".dbconn"):
-        with open('.dbconn', 'r') as file:
-            data = file.read().replace('\n', '')
-            if data:
-                app.config['DBCONNSTRING'] = data
+    if os.environ.get("FLASK_ENV") == "development":
+        app.config['DBCONNSTRING'] = os.environ.get("DBSTRING")
+    else:
+        if os.environ.get("DEPLOYMENT_PLATFORM") == "Heroku":    
+            if os.environ.get("JAWSDB_MARIA_URL"):
+                app.config['DBCONNSTRING'] = os.environ.get("JAWSDB_MARIA_URL")
             else:
                 app.config['DBCONNSTRING'] = ""
-    else:
-        app.config['DBCONNSTRING'] = ""
+        elif os.path.isfile(".dbconn"):
+            with open('.dbconn', 'r') as file:
+                data = file.read().replace('\n', '')
+                if data:
+                    app.config['DBCONNSTRING'] = data
+                else:
+                    app.config['DBCONNSTRING'] = ""
+        else:
+            app.config['DBCONNSTRING'] = ""
 
 def setup_config(app):
     if check_config_exists():
