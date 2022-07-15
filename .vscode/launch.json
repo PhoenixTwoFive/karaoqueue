@@ -8,11 +8,11 @@
             "preLaunchTask": "versiondump",
             "name": "Python: Flask",
             "type": "python",
-            "cwd": "${workspaceFolder}/backend/app",
+            "cwd": "${workspaceFolder}/backend",
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "backend/app/main.py",
+                "FLASK_APP": "backend/main.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
@@ -27,11 +27,11 @@
             "preLaunchTask": "versiondump",
             "name": "Python: Flask (with reload)",
             "type": "python",
-            "cwd": "${workspaceFolder}/backend/app",
+            "cwd": "${workspaceFolder}/backend",
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "backend/app/main.py",
+                "FLASK_APP": "backend/main.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
@@ -45,11 +45,11 @@
             "preLaunchTask": "versiondump",
             "name": "Python: Flask (with reload, externally reachable)",
             "type": "python",
-            "cwd": "${workspaceFolder}/backend/app",
+            "cwd": "${workspaceFolder}/backend",
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "backend/app/main.py",
+                "FLASK_APP": "backend/main.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
@@ -64,11 +64,11 @@
             "preLaunchTask": "versiondump",
             "name": "Python: Flask (externally reachable)",
             "type": "python",
-            "cwd": "${workspaceFolder}/backend/app",
+            "cwd": "${workspaceFolder}/backend",
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "backend/app/main.py",
+                "FLASK_APP": "backend/main.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },

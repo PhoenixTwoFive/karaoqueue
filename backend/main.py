@@ -6,7 +6,7 @@ import os
 import json
 from flask_basicauth import BasicAuth
 from helpers import nocache
-app = Flask(__name__, static_url_path='/static')
+app = Flask("backend", static_url_path='/static')
 
 basic_auth = BasicAuth(app)
 accept_entries = False
