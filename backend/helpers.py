@@ -36,7 +36,9 @@ def check_config_exists():
     return os.path.isfile(config_file)
 
 def load_version(app):
-    if os.path.isfile(".version"):
+    if os.environ.get("SOURCE_VERSION"):
+        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")
+    elif os.path.isfile(".version"):
         with open('.version', 'r') as file:
             data = file.read().replace('\n', '')
             if data:
