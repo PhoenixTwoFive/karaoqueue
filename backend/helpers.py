@@ -47,6 +47,19 @@ def load_version(app):
                 app.config['VERSION'] = ""
     else:
         app.config['VERSION'] = ""
+        
+def load_dbconfig(app):
+    if os.environ.get("JAWSDB_MARIA_URL"):
+        app.config['VERSION'] = os.environ.get("JAWSDB_MARIA_URL")
+    elif os.path.isfile(".dbconn"):
+        with open('.dbconn', 'r') as file:
+            data = file.read().replace('\n', '')
+            if data:
+                app.config['DBCONNSTRING'] = data
+            else:
+                app.config['DBCONNSTRING'] = ""
+    else:
+        app.config['DBCONNSTRING'] = ""
 
 def setup_config(app):
     if check_config_exists():

@@ -229,6 +229,7 @@ def admin():
 
 @app.before_first_request
 def activate_job():
+    helpers.load_dbconfig(app)
     helpers.load_version(app)
     helpers.create_data_directory()
     database.create_entry_table()

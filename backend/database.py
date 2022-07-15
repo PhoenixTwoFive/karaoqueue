@@ -6,6 +6,7 @@ from sqlalchemy import create_engine, engine
 import mariadb
 import pandas
 from io import StringIO
+from flask import current_app
 
 song_table = "songs"
 entry_table = "entries"
@@ -18,8 +19,7 @@ connection = None
 def open_db() -> engine.base.Connection:
     global connection
     if (not connection):
-        engine = create_engine(
-            "mysql://ek0ur6p6ky9gdmif:jk571ov6g38g5iqv@eporqep6b4b8ql12.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/xdfmpudc3remzgj0")
+        engine = create_engine(current_app.config.get("DBCONNSTRING"))
         connection = engine.connect()
     # cur.execute('PRAGMA encoding = "UTF-8";')
     return connection
