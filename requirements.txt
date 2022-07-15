@@ -2,3 +2,4 @@ requests
 pandas
 Flask-BasicAuth
 bs4
+gunicorn
