@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, abort, request, redirect, send_from_directory
+from flask import Flask, render_template, Response, abort, request, redirect, send_from_directory, jsonify
 import helpers
 import database
 import data_adapters
@@ -131,8 +131,8 @@ def get_song_completions(input_string=""):
     input_string = request.args.get('search', input_string)
     if input_string != "":
         print(input_string)
-        list = database.get_song_completions(input_string=input_string)
-        return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
+        result = [list(x) for x in database.get_song_completions(input_string=input_string)]
+        return jsonify(result)
 
     else:
         return 400

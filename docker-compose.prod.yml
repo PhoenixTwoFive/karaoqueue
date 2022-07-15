@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: dpMAZj*Mc4%FZM!V
+      MARIADB_ROOT_HOST: localhost
+      MARIADB_DATABASE: karaoqueue
+      MARIADB_USER: karaoqueue
+      MARIADB_PASSWORD: a5G@P*^tCW$$w@wE
