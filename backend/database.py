@@ -1,9 +1,8 @@
 # -*- coding: utf_8 -*-
 
-from types import NoneType
+from email.mime import base
 from MySQLdb import Connection
-from sqlalchemy import create_engine
-import sqlite3
+from sqlalchemy import create_engine, engine
 import mariadb
 import pandas
 from io import StringIO
@@ -16,7 +15,7 @@ done_table = "done_songs"
 connection = None
 
 
-def open_db() -> Connection:
+def open_db() -> engine.base.Connection:
     global connection
     if (not connection):
         engine = create_engine(
