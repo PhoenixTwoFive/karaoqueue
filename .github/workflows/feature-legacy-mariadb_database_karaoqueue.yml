@@ -27,8 +27,10 @@ jobs:
           python -m venv venv
           source venv/bin/activate
       
-      - name: Install mysql
-        run: sudo sudo apt install -y mysql-server libmysqlclient-dev python3-dev
+      - name: Install mariadb
+        run: |
+          sudo apt-get remove --purge mysql-server mysql-client mysql-common libmysqlclient-dev
+          sudo sudo apt install -y libmariadbclient-dev python3-dev
 
       
       - name: Install dependencies
