@@ -137,7 +137,7 @@
   "defaultProject": "ng-karaoqueue",
   "schematics": {
     "@schematics/angular:component": {
-      "styleext": "scss"
+      "style": "scss"
     }
   }
 }
