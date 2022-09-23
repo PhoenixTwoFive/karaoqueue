@@ -18,7 +18,7 @@ def create_data_directory():
 def get_catalog_url():
     r = requests.get('https://www.karafun.de/karaoke-song-list.html')
     soup = BeautifulSoup(r.content, 'html.parser')
-    url = soup.findAll('a', href=True, text='Available in CSV format')[0]['href']
+    url = soup.findAll('a', href=True, text='Verfügbar in CSV-Format')[0]['href']
     return url
 
 def get_songs(url):
@@ -36,7 +36,9 @@ def check_config_exists():
     return os.path.isfile(config_file)
 
 def load_version(app):
-    if os.path.isfile(".version"):
+    if os.environ.get("SOURCE_VERSION"):
+        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[0:7]
+    elif os.path.isfile(".version"):
         with open('.version', 'r') as file:
             data = file.read().replace('\n', '')
             if data:

@@ -131,3 +131,10 @@ dmypy.json
 
 # Test data
 data/
+
+# Node Modules
+
+node_modules/
+
+# Version identification file
+.version
