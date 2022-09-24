@@ -47,8 +47,6 @@ import { SongSearchComponent } from './song-search/song-search.component';
 
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 
-import { RuntimeConfigLoaderModule } from 'runtime-config-loader';
-
 @NgModule({
   declarations: [
     AppComponent,

@@ -138,3 +138,5 @@ node_modules/
 
 # Version identification file
 .version
+
+**/.angular/

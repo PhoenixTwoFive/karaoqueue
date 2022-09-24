@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { RuntimeConfigLoaderService } from 'runtime-config-loader';
+ 
 import { Entry } from './models/entry.model';
 import { Observable } from 'rxjs';
 
