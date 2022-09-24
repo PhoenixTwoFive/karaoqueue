@@ -11,6 +11,6 @@ export class Genre {
   }
 
 
-  id: number;
+  id: number; 
   _name: string;
 }
