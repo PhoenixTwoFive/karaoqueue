@@ -127,7 +127,6 @@
       }
     }
   },
-  "defaultProject": "ng-karaoqueue",
   "schematics": {
     "@schematics/angular:component": {
       "style": "scss"
