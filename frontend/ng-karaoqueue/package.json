@@ -24,7 +24,6 @@
     "@angular/router": "~12.2.16",
     "@mdi/angular-material": "^5.0.45",
     "hammerjs": "^2.0.8",
-    "runtime-config-loader": "^2.0.0",
     "rxjs": "~6.5.4",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.4"
