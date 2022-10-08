@@ -8,6 +8,13 @@
             "type": "shell",
             "command": "echo \"$(git rev-parse --abbrev-ref HEAD)-$(git describe)\"> ${workspaceFolder}/backend/.version",
             "problemMatcher": []
+        },
+        {
+            "label": "mariadb",
+            "type": "shell",
+            "command": "docker run --rm --name some-mariadb --env MARIADB_USER=devuser --env MARIADB_PASSWORD=devpw --env MARIADB_ROOT_PASSWORD=devrootpw --env MARIADB_DATABASE=karaoqueue -p 3306:3306 mariadb:latest",
+            "isBackground": true,
+            "activeOnStart": false
         }
     ]
 }

@@ -3,3 +3,5 @@ pandas
 Flask-BasicAuth
 bs4
 gunicorn
+SQLAlchemy
+mysqlclient
