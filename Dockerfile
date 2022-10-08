@@ -8,4 +8,4 @@ RUN pip install Flask-BasicAuth
 
 RUN pip install bs4
 
-COPY ./app /app
+COPY ./backend /app

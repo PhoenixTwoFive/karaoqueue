@@ -1,4 +1,5 @@
-from flask import Flask, render_template, Response, abort, request, redirect, send_from_directory, jsonify
+from flask import Flask, render_template, abort, request, redirect, send_from_directory, jsonify
+from flask.wrappers import Request, Response
 import helpers
 import database
 import data_adapters
@@ -9,7 +10,7 @@ from helpers import nocache
 app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
-accept_entries = False
+accept_entries = True
 
 @app.route("/")
 def home():
@@ -81,12 +82,12 @@ def settings():
 def settings_post():
     entryquota = request.form.get("entryquota")
     maxqueue = request.form.get("maxqueue")
-    if entryquota.isnumeric() and int(entryquota) > 0:
-        app.config['ENTRY_QUOTA'] = int(entryquota)
+    if entryquota.isnumeric() and int(entryquota) > 0:  # type: ignore
+        app.config['ENTRY_QUOTA'] = int(entryquota)  # type: ignore
     else:
         abort(400)
-    if maxqueue.isnumeric and int(maxqueue) > 0:
-        app.config['MAX_QUEUE'] = int(maxqueue)
+    if maxqueue.isnumeric and int(maxqueue) > 0:  # type: ignore
+        app.config['MAX_QUEUE'] = int(maxqueue)  # type: ignore
     else:
         abort(400)
 

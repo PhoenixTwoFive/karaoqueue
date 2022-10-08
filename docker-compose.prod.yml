@@ -1,5 +1,17 @@
 version: "3.9"
 services:
+  karaoqueue:
+    image: "phillipkhne/karaoqueue:latest"
+    restart: always
+    ports:
+      - "127.0.0.1:8081:80"
+    environment:
+      DEPLOYMENT_PLATFORM: Docker
+      DBSTRING: mysql://user:pass@host:3306/database
+      BASIC_AUTH_USERNAME: admin
+      BASIC_AUTH_PASSWORD: changeme
+      ENTRY_QUOTA: 3
+      MAX_QUEUE: 20
   db:
     image: mariadb
     restart: always

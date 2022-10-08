@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
@@ -15,7 +15,7 @@
                 "FLASK_APP": "backend/app.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1", 
-                "DBSTRING": "mysql://ek0ur6p6ky9gdmif:kpmi2bav4mvh4jbx@eporqep6b4b8ql12.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/xdfmpudc3remzgj0"
+                "DBSTRING": "mysql://devuser:devpw@127.0.0.1:3306/karaoqueue"
             },
             "args": [
                 "run",
@@ -25,7 +25,7 @@
             "jinja": true
         },
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask (with reload)",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
@@ -43,7 +43,7 @@
             "jinja": true
         },
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask (with reload, externally reachable)",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
@@ -62,7 +62,7 @@
             "jinja": true
         },
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask (externally reachable)",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
