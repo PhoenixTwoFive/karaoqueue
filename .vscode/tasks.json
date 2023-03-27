@@ -12,7 +12,7 @@
         {
             "label": "mariadb",
             "type": "shell",
-            "command": "docker run --rm --name some-mariadb --env MARIADB_USER=devuser --env MARIADB_PASSWORD=devpw --env MARIADB_ROOT_PASSWORD=devrootpw --env MARIADB_DATABASE=karaoqueue -p 3306:3306 mariadb:latest",
+            "command": "docker-compose -f docker-compose.yml up --remove-orphans",
             "isBackground": true,
             "activeOnStart": false
         }

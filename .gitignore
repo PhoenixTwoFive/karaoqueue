@@ -138,3 +138,6 @@ node_modules/
 
 # Version identification file
 .version
+
+# Docker secrets
+secrets.yml

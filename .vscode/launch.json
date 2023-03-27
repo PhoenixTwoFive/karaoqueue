@@ -15,8 +15,8 @@
                 "FLASK_APP": "backend/app.py",
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1", 
-                "DBSTRING": "mysql://devuser:devpw@127.0.0.1:3306/karaoqueue"
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger",
@@ -36,6 +36,7 @@
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger"
@@ -54,6 +55,7 @@
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger",
@@ -73,6 +75,7 @@
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger",

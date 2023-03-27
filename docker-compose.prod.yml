@@ -1,10 +1,15 @@
 version: "3.9"
+
+secrets:
+  secrets:
+    file: ./secrets.yml
+
 services:
   karaoqueue:
     image: "phillipkhne/karaoqueue:latest"
     restart: always
     ports:
-      - "127.0.0.1:8081:80"
+      - "127.0.0.1:8081:80" # Please put a reverse proxy in front of this
     environment:
       DEPLOYMENT_PLATFORM: Docker
       DBSTRING: mysql://user:pass@host:3306/database
@@ -16,8 +21,8 @@ services:
     image: mariadb
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: dpMAZj*Mc4%FZM!V
+      MARIADB_ROOT_PASSWORD: changeme!
       MARIADB_ROOT_HOST: localhost
       MARIADB_DATABASE: karaoqueue
       MARIADB_USER: karaoqueue
-      MARIADB_PASSWORD: a5G@P*^tCW$$w@wE
+      MARIADB_PASSWORD: change
