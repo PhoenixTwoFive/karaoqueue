@@ -115,7 +115,7 @@ body {
 }
 
 .footer {
-    background-color: #232323;
+    background-color: var(--background-color-var);
 }
 
 .modal-content {

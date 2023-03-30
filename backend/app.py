@@ -133,7 +133,7 @@ def update_songs():
     return Response('{"status": "%s" }' % status, mimetype='text/json')
 
 
-@app.route("/api/songs/compl")
+@app.route("/api/songs/compl") # type: ignore
 @nocache
 def get_song_completions(input_string=""):
     input_string = request.args.get('search', input_string)
