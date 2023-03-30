@@ -248,7 +248,6 @@ def admin():
 def activate_job():
     helpers.load_dbconfig(app)
     helpers.load_version(app)
-    helpers.create_data_directory()
     database.create_entry_table()
     database.create_song_table()
     database.create_done_song_table()
