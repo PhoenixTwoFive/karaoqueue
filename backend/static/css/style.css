@@ -1,8 +1,36 @@
-body {
-    padding-top: 5rem;
+:root {
+    /* Navbar */
+    --navbar-background-color: #343a40;
+    --navbar-text-color: rgba(255, 255, 255, .5);
+    --navbar-text-color-hover: rgba(255, 255, 255, .75);
+    --navbar-text-color-active: rgba(255, 255, 255, 1);
+
+    /* Common */
+    --background-color: #ffffff;
+    --background-color-var: #f5f5f5;
+    --text-color: #212529;
+    --text-color-var: #343a40;
+
+    /* Modals */
+    --modal-background-color: #ffffff;
+    --modal-separator-color: #dee2e6;
+    --modal-close-color: #212529;
+
+    /* Tables */
+    --table-border-color: #dee2e6;
+
+    /* Input */
+    --input-background-color: #ffffff;
 }
 
-html, body {
+
+body {
+    padding-top: 5rem;
+    background-color: var(--background-color);
+}
+
+html,
+body {
     height: 100%;
 }
 
@@ -12,7 +40,8 @@ html, body {
 }
 
 main {
-    padding-bottom: 60px; /* Höhe des Footers */
+    padding-bottom: 60px;
+    /* Höhe des Footers */
 }
 
 .footer {
@@ -21,7 +50,7 @@ main {
     height: 60px;
     /* Set the fixed height of the footer here */
     /*line-height: 60px; /* Vertically center the text there */
-    background-color: #f5f5f5;
+    background-color: var(--background-color-var);
 }
 
 .topbutton {
@@ -56,6 +85,10 @@ table td:first-child {
     max-width: 200px !important;
 }
 
+.fa-solid {
+    vertical-align: auto;
+}
+
 @media (min-width: 768px) {
     .topbutton {
         width: auto;
@@ -76,58 +109,82 @@ table td:first-child {
     }
 }
 
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.footer {
+    background-color: #232323;
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.modal-header {
+    background-color: var(--background-color);
+    color: var(--text-color-var);
+    border-color: var(var(--modal-separator-color));
+}
+
+.modal-footer {
+    background-color: var(--background-color);
+    color: var(--text-color-var);
+    border-color: var(var(--modal-separator-color));
+}
+
+.form-control {
+    background-color: var(--input-background-color);
+    color: var(--text-color)
+}
+
+.form-control:focus {
+    background-color: var(--input-background-color);
+    color: var(--text-color)
+}
+
+.table td,
+.table th {
+    border-color: var(--table-border-color)
+}
+
+.table thead th {
+    border-color: var(--table-border-color)
+}
+
+.close {
+    color: var(--text-color)
+}
+
+pre {
+    color: var(--text-color-var)
+}
+
 @media (prefers-color-scheme: dark) {
+    :root {
+        /* Navbar */
+        --navbar-background-color: #343a40;
+        --navbar-text-color: rgba(255, 255, 255, .5);
+        --navbar-text-color-hover: rgba(255, 255, 255, .75);
+        --navbar-text-color-active: rgba(255, 255, 255, 1);
 
-    body {
-        background-color: #121212;
-        color: #f5f5f5;
-    }
-    
-    .footer {
-        background-color: #232323;
-    }
+        /* Common */
+        --background-color: #121212;
+        --background-color-var: #232323;
+        --text-color: #f5f5f5;
+        --text-color-var: #a2a2a2;
 
-    .modal-content {
-        background-color: #121212;
-        color: #f5f5f5;
-    }
+        /* Modals */
+        --modal-background-color: #121212;
+        --modal-separator-color: #232323;
+        --modal-close-color: #f5f5f5;
 
-    .modal-header {
-        background-color: #121212;
-        color: #f5f5f5;
-        border-color: #232323;
-    }
+        /* Tables */
+        --table-border-color: #232323;
 
-    .modal-footer {
-        background-color: #121212;
-        color: #f5f5f5;
-        border-color: #232323;
+        /* Input */
+        --input-background-color: #343434;
     }
-
-    .form-control {
-        background-color: #343434;
-        color: #f5f5f5;
-    }
-
-    .form-control:focus {
-        background-color: #343434;
-        color: #f5f5f5;
-    }
-
-    .table td, .table th {
-        border-color: #232323;
-    }
-
-    .table thead th {
-        border-color: #232323;
-    }
-
-    .close {
-        color: #f5f5f5;
-    }
-    
-    pre {
-        color: #a2a2a2;
-    }
-
 }
