@@ -83,6 +83,9 @@ def settings_post():
     entryquota = request.form.get("entryquota")
     maxqueue = request.form.get("maxqueue")
     theme = request.form.get("theme")
+    username = request.form.get("username")
+    password = request.form.get("password")
+    changed_credentials = False
     if entryquota.isnumeric() and int(entryquota) > 0:  # type: ignore
         app.config['ENTRY_QUOTA'] = int(entryquota)  # type: ignore
     else:
@@ -91,14 +94,21 @@ def settings_post():
         app.config['MAX_QUEUE'] = int(maxqueue)  # type: ignore
     else:
         abort(400)
-    if theme in helpers.get_themes():
-        app.config['THEME'] = theme
+    if theme is not None and theme in helpers.get_themes():
+        helpers.set_theme(app,theme)
     else:
         abort(400)
-
+    if username != "" and username != app.config['BASIC_AUTH_USERNAME']:
+        app.config['BASIC_AUTH_USERNAME'] = username
+        changed_credentials = True
+    if password != "":
+        app.config['BASIC_AUTH_PASSWORD'] = password
+        changed_credentials = True
     helpers.persist_config(app=app)
-
-    return render_template('settings.html', app=app, auth=basic_auth.authenticate())
+    if changed_credentials:
+        return redirect("/")
+    else:
+        return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes())
 
 
 @app.route("/api/queue")

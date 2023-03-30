@@ -18,6 +18,18 @@
             {% endfor %}
         </select>
     </p>
+    <div class="alert alert-warning" role="alert">
+        <i class="fas fa-exclamation-triangle mr-1"></i>
+        <strong>Warnung:</strong> Änderungen an den folgenden Einstellungen führen zu einer sofortigen Abmeldung!
+    </div>
+    <p>
+        <label for="username">Benutzername</label>
+        <input type="text" class="form-control" id="username" name="username" value={{app.config['BASIC_AUTH_USERNAME']}}>
+    </p>
+    <p>
+        <label for="password">Passwort ändern</label>
+        <input type="password" class="form-control" id="password" name="password">
+    </p>
     <input type="submit" class="btn btn-primary mr-1 mb-2" value="Einstellungen anwenden">
 </form>
 <details>
