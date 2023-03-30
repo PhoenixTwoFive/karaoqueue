@@ -30,7 +30,7 @@ $.getJSON("/api/entries/accept", (data) => {
         $("#bfb").prop("aria-disabled",true);
         $("#bfb").prop("tabindex","-1");
         $("#bfb").wrap("<span class='tooltip-span' tabindex='0' data-toggle='tooltip' data-placement='bottom'></span>");
-                $(".tooltip-span").prop("title", "Eintragungen sind leider nicht mehr möglich.")
+                $(".tooltip-span").prop("title", "Eintragungen sind leider momentan nicht möglich.")
                 $('[data-toggle="tooltip"]').tooltip()
     }
 })
