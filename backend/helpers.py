@@ -11,6 +11,7 @@ import database
 data_directory = "data"
 config_file = data_directory+"/config.json"
 
+
 def create_data_directory():
     if not os.path.exists(data_directory):
         os.makedirs(data_directory)
@@ -19,12 +20,15 @@ def create_data_directory():
 def get_catalog_url():
     r = requests.get('https://www.karafun.de/karaoke-song-list.html')
     soup = BeautifulSoup(r.content, 'html.parser')
-    url = soup.findAll('a', href=True, text='Verfügbar in CSV-Format')[0]['href']
+    url = soup.findAll(
+        'a', href=True, text='Verfügbar in CSV-Format')[0]['href']
     return url
+
 
 def get_songs(url):
     r = requests.get(url)
     return r.text
+
 
 def is_valid_uuid(val):
     try:
@@ -33,12 +37,15 @@ def is_valid_uuid(val):
     except ValueError:
         return False
 
+
 def check_config_exists():
     return database.check_config_table()
 
+
 def load_version(app: Flask):
     if os.environ.get("SOURCE_VERSION"):
-        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[0:7] # type: ignore
+        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[
+            0:7]  # type: ignore
     elif os.path.isfile(".version"):
         with open('.version', 'r') as file:
             data = file.read().replace('\n', '')
@@ -48,21 +55,22 @@ def load_version(app: Flask):
                 app.config['VERSION'] = ""
     else:
         app.config['VERSION'] = ""
-        
+
+
 def load_dbconfig(app: Flask):
     if os.environ.get("FLASK_ENV") == "development":
         app.config['DBCONNSTRING'] = os.environ.get("DBSTRING")
     else:
-        if os.environ.get("DEPLOYMENT_PLATFORM") == "Heroku":    
+        if os.environ.get("DEPLOYMENT_PLATFORM") == "Heroku":
             if os.environ.get("JAWSDB_MARIA_URL"):
                 app.config['DBCONNSTRING'] = os.environ.get("JAWSDB_MARIA_URL")
             else:
                 app.config['DBCONNSTRING'] = ""
-        if os.environ.get("DEPLOYMENT_PLATFORM") == "Docker": 
+        if os.environ.get("DEPLOYMENT_PLATFORM") == "Docker":
             if os.environ.get("DBSTRING"):
                 app.config['DBCONNSTRING'] = os.environ.get("DBSTRING")
             else:
-                app.config['DBCONNSTRING'] = ""   
+                app.config['DBCONNSTRING'] = ""
         elif os.path.isfile(".dbconn"):
             with open('.dbconn', 'r') as file:
                 data = file.read().replace('\n', '')
@@ -74,15 +82,31 @@ def load_dbconfig(app: Flask):
             exit("No database connection string found. Cannot continue. Please set the environment variable DBSTRING or create a file .dbconn in the root directory of the project.")
 
 # Check if config exists in DB, if not, create it.
+
+
 def setup_config(app: Flask):
-    if check_config_exists():
-        config = database.get_config_list()
-        print("Loaded existing config")
-    else:
-        config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20, 'entries_allowed': 1, 'theme': 'default.css'}
-        for key, value in config.items():
+    if check_config_exists() == False:
+        print("No config found, creating new config"):
+        initial_username = os.environ.get("INITIAL_USERNAME")
+        initial_password = os.environ.get("INITIAL_PASSWORD")
+        if initial_username is None:
+            print(
+                "No initial username set. Please set the environment variable INITIAL_USERNAME")
+            exit()
+        if initial_password is None:
+            print(
+                "No initial password set. Please set the environment variable INITIAL_PASSWORD")
+            exit()
+        default_config = {'username': initial_username,
+                          'password': initial_password,
+                          'entryquota': 3,
+                          'maxqueue': 20,
+                          'entries_allowed': 1,
+                          'theme': 'default.css'}
+        for key, value in default_config.items():
             database.set_config(key, value)
         print("Created new config")
+    config = database.get_config_list()
     app.config['BASIC_AUTH_USERNAME'] = config['username']
     app.config['BASIC_AUTH_PASSWORD'] = config['password']
     app.config['ENTRY_QUOTA'] = config['entryquota']
@@ -91,6 +115,8 @@ def setup_config(app: Flask):
     app.config['THEME'] = config['theme']
 
 # set queue admittance
+
+
 def set_accept_entries(app: Flask, allowed: bool):
     if allowed:
         app.config['ENTRIES_ALLOWED'] = True
@@ -100,6 +126,8 @@ def set_accept_entries(app: Flask, allowed: bool):
         database.set_config('entries_allowed', '0')
 
 # get queue admittance
+
+
 def get_accept_entries(app: Flask) -> bool:
     state = bool(int(database.get_config('entries_allowed')))
     app.config['ENTRIES_ALLOWED'] = state
@@ -108,11 +136,14 @@ def get_accept_entries(app: Flask) -> bool:
 
 # Write settings from current app.config to DB
 def persist_config(app: Flask):
-    config = {'username': app.config['BASIC_AUTH_USERNAME'], 'password': app.config['BASIC_AUTH_PASSWORD'], 'entryquota': app.config['ENTRY_QUOTA'], 'maxqueue': app.config['MAX_QUEUE']}
+    config = {'username': app.config['BASIC_AUTH_USERNAME'], 'password': app.config['BASIC_AUTH_PASSWORD'],
+              'entryquota': app.config['ENTRY_QUOTA'], 'maxqueue': app.config['MAX_QUEUE']}
     for key, value in config.items():
         database.set_config(key, value)
 
 # Get available themes from themes directory
+
+
 def get_themes():
     themes = []
     for theme in os.listdir('./static/css/themes'):
@@ -120,6 +151,8 @@ def get_themes():
     return themes
 
 # Set theme
+
+
 def set_theme(app: Flask, theme: str):
     if theme in get_themes():
         app.config['THEME'] = theme
@@ -137,5 +170,5 @@ def nocache(view):
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '-1'
         return response
-        
+
     return update_wrapper(no_cache, view)
