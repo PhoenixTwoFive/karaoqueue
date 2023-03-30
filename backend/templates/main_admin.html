@@ -1,15 +1,13 @@
-
-
 {% extends 'base.html' %}
 {% block title %}Warteliste-Admin{% endblock %}
 {% block content %}
 <style>
-table td:nth-child(2) {
-    overflow-y: hidden;
-    overflow-x: auto;
-    text-overflow: clip;
-    max-width: 200px !important;
-}
+    table td:nth-child(2) {
+        overflow-y: hidden;
+        overflow-x: auto;
+        text-overflow: clip;
+        max-width: 200px !important;
+    }
 </style>
 <div class="container">
     <div id="toolbar">
@@ -18,24 +16,13 @@ table td:nth-child(2) {
         <button type="button" class="topbutton btn btn-danger" onclick="confirmUpdateSongDatabase()"><i
                 class="fas fa-file-import mr-2"></i>Song-Datenbank
             aktualisieren</button>
-        <input id="entryToggle" type="checkbox" class="topbutton" data-toggle="toggle" data-on="Eintragen erlaubt" data-off="Eintragen deaktiviert" data-onstyle="success" data-offstyle="danger">
+        <input id="entryToggle" type="checkbox" class="topbutton" data-toggle="toggle" data-on="Eintragen erlaubt"
+            data-off="Eintragen deaktiviert" data-onstyle="success" data-offstyle="danger">
     </div>
-    <table class="table entries"
-            id="entrytable"
-            data-toggle="table"
-            data-search="true"
-            data-show-columns="true"
-            data-show-toggle="true"
-            data-multiple-select-row="true"
-            data-click-to-select="true"
-            data-toolbar="#toolbar"
-            data-pagination="true"
-            data-show-extended-pagination="true"
-            data-classes="table table-hover"
-            data-url="/api/queue"
-            data-show-refresh="true"
-            data-auto-refresh="true"
-            data-auto-refresh-interval="10">
+    <table class="table entries" id="entrytable" data-toggle="table" data-search="true" data-show-columns="true"
+        data-show-toggle="true" data-multiple-select-row="true" data-click-to-select="true" data-toolbar="#toolbar"
+        data-pagination="true" data-show-extended-pagination="true" data-classes="table table-hover"
+        data-url="/api/queue" data-show-refresh="true" data-auto-refresh="true" data-auto-refresh-interval="10">
         <thead>
             <tr>
                 <th data-field="state" data-checkbox="true"></th>
@@ -53,15 +40,18 @@ table td:nth-child(2) {
 <script>
     $(function () {
         refreshEntryToggle()
-        $('#entryToggle').change(function() {
-            $.ajax({url: "/api/entries/accept/"+($('#entryToggle').is(":checked") ? "1" : "0"), complete: setTimeout(refreshEntryToggle, 1000)});
+        $('#entryToggle').change(function () {
+            $.ajax({ url: "/api/entries/accept/" + ($('#entryToggle').is(":checked") ? "1" : "0"), complete: setTimeout(refreshEntryToggle, 1000) });
         })
-        $("#entrytable").bootstrapTable().on('load-success.bs.table', function() {
+        $("#entrytable").bootstrapTable().on('load-success.bs.table', function () {
             $('[data-toggle="tooltip"]').tooltip()
+        })
+        $('[data-toggle="tooltip"]').tooltip({
+            trigger: 'hover'
         })
     })
     function confirmDeleteEntry(name, entry_id) {
-        bootbox.confirm("Wirklich den Eintrag von "+name+" löschen?", function(result){
+        bootbox.confirm("Wirklich den Eintrag von " + name + " löschen?", function (result) {
             if (result) {
                 deleteEntry(entry_id)
             }
@@ -69,7 +59,7 @@ table td:nth-child(2) {
     }
     function confirmDeleteSelectedEntries() {
         bootbox.confirm({
-            message: "Wirklich gewählte Eintragungen löschen?", 
+            message: "Wirklich gewählte Eintragungen löschen?",
             buttons: {
                 confirm: {
                     label: 'Ja',
@@ -80,7 +70,7 @@ table td:nth-child(2) {
                     className: 'btn btn-secondary'
                 }
             },
-            callback: function(result){
+            callback: function (result) {
                 if (result) {
                     DeleteSelectedEntries(getIdSelections())
                 }
@@ -100,22 +90,22 @@ table td:nth-child(2) {
                     className: 'btn btn-secondary'
                 }
             },
-            callback: function(result){
+            callback: function (result) {
                 if (result) {
                     var dialog = bootbox.dialog({
                         message: '<p class="text-center mb-0"><i class="fa fa-spin fa-cog"></i> Aktualisiere Song-Datenbank...</p>',
-    
+
                         closeButton: false
                     });
-                    updateSongDatabase(dialog)                    
+                    updateSongDatabase(dialog)
                 }
             }
         })
     }
     function refreshEntryToggle() {
         $.getJSON("/api/entries/accept", (data) => {
-            if (data["value"]!=$('#entryToggle').is(":checked")) {
-                if(data["value"]==1) {
+            if (data["value"] != $('#entryToggle').is(":checked")) {
+                if (data["value"] == 1) {
                     $('#entryToggle').data('bs.toggle').on('true')
                 }
                 else {
@@ -125,53 +115,53 @@ table td:nth-child(2) {
         })
     }
     function deleteEntry(entry_id) {
-       $.ajax({
-        type: 'GET',
-        url: '/api/entries/delete/'+entry_id,
-        contentType: "application/json",
-        dataType: 'json',
-        async: false
-       });
-       $("#entrytable").bootstrapTable('refresh')
-    
+        $.ajax({
+            type: 'GET',
+            url: '/api/entries/delete/' + entry_id,
+            contentType: "application/json",
+            dataType: 'json',
+            async: false
+        });
+        $("#entrytable").bootstrapTable('refresh')
+
     }
     function markEntryAsSung(entry_id) {
-       $.ajax({
-        type: 'GET',
-        url: '/api/entries/mark_sung/'+entry_id,
-        contentType: "application/json",
-        dataType: 'json',
-        async: false
-       });
-       $("#entrytable").bootstrapTable('refresh')
-    
+        $.ajax({
+            type: 'GET',
+            url: '/api/entries/mark_sung/' + entry_id,
+            contentType: "application/json",
+            dataType: 'json',
+            async: false
+        });
+        $("#entrytable").bootstrapTable('refresh')
+
     }
 
     function markEntryAsTransferred(entry_id) {
         $.ajax({
-         type: 'GET',
-         url: '/api/entries/mark_transferred/'+entry_id,
-         contentType: "application/json",
-         dataType: 'json',
-         async: false
+            type: 'GET',
+            url: '/api/entries/mark_transferred/' + entry_id,
+            contentType: "application/json",
+            dataType: 'json',
+            async: false
         });
         $("#entrytable").bootstrapTable('refresh')
-     
-     }
+
+    }
 
     function DeleteSelectedEntries(ids) {
         $.ajax({
             type: 'POST',
             url: '/api/entries/delete',
             data: JSON.stringify(ids), // or JSON.stringify ({name: 'jonas'}),
-            error: function() {
+            error: function () {
                 bootbox.alert({
                     message: "Fehler beim Löschen der Eintragungen.",
                 })
             },
-            success: function() {
+            success: function () {
                 $("#entrytable").bootstrapTable('refresh')
-            
+
             },
             contentType: "application/json",
             dataType: 'json'
@@ -183,28 +173,29 @@ table td:nth-child(2) {
             url: '/api/songs/update',
             contentType: "application/json",
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 wait_dialog.modal('hide')
                 bootbox.alert({
                     message: data["status"],
-                    callback: function() {
+                    callback: function () {
                         $("#entrytable").bootstrapTable('refresh')
                     }
                 })
             }
         });
     }
-    function TableActions (value, row, index) {
-        console.log("Value: "+value+", Row: "+row+", Index: "+index)
+    function TableActions(value, row, index) {
+        console.log("Value: " + value + ", Row: " + row + ", Index: " + index)
         console.log(row)
         let outerHTML = ""
-        if (row.Transferred==1) {
-            outerHTML = "<button type=\"button\" class=\"btn btn-default\" onclick=\"markEntryAsTransferred("+row.entry_ID+")\"><i class=\"fas fa-backward\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"markEntryAsSung("+row.entry_ID+")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"confirmDeleteEntry('"+row.Name+"',"+row.entry_ID+")\"><i class=\"fas fa-trash\"></i></button>";
+        if (row.Transferred == 1) {
+            outerHTML = "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Markierung zurückziehen\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsTransferred(" + row.entry_ID + ")\"><i class=\"fas fa-backward\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsSung(" + row.entry_ID + ")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');confirmDeleteEntry('" + row.Name + "'," + row.entry_ID + ")\"><i class=\"fas fa-trash\"></i></button>";
         } else {
-            outerHTML = "<button type=\"button\" class=\"btn btn-info\" onclick=\"markEntryAsTransferred("+row.entry_ID+")\"><i class=\"fas fa-exchange-alt\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"markEntryAsSung("+row.entry_ID+")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"confirmDeleteEntry('"+row.Name+"',"+row.entry_ID+")\"><i class=\"fas fa-trash\"></i></button>";
+            outerHTML = "<button type=\"button\" class=\"btn btn-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als übertragen markieren\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsTransferred(" + row.entry_ID + ")\"><i class=\"fas fa-exchange-alt\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsSung(" + row.entry_ID + ")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');confirmDeleteEntry('" + row.Name + "'," + row.entry_ID + ")\"><i class=\"fas fa-trash\"></i></button>";
         }
         return outerHTML;
     }
+
     function getIdSelections() {
         return $.map($("#entrytable").bootstrapTable('getSelections'), function (row) {
             return row.entry_ID
