@@ -44,8 +44,7 @@ def check_config_exists():
 
 def load_version(app: Flask):
     if os.environ.get("SOURCE_VERSION"):
-        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[
-            0:7]  # type: ignore
+        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[0:7]  # type: ignore # noqa: E501
     elif os.path.isfile(".version"):
         with open('.version', 'r') as file:
             data = file.read().replace('\n', '')
@@ -86,7 +85,7 @@ def load_dbconfig(app: Flask):
 
 def setup_config(app: Flask):
     if check_config_exists() == False:
-        print("No config found, creating new config"):
+        print("No config found, creating new config")
         initial_username = os.environ.get("INITIAL_USERNAME")
         initial_password = os.environ.get("INITIAL_PASSWORD")
         if initial_username is None:
