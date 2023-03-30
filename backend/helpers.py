@@ -88,6 +88,7 @@ def setup_config(app: Flask):
     app.config['ENTRY_QUOTA'] = config['entryquota']
     app.config['MAX_QUEUE'] = config['maxqueue']
     app.config['ENTRIES_ALLOWED'] = bool(config['entries_allowed'])
+    app.config['THEME'] = config['theme']
 
 # set queue admittance
 def set_accept_entries(app: Flask, allowed: bool):
