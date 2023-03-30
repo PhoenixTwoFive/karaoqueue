@@ -34,15 +34,7 @@ def is_valid_uuid(val):
         return False
 
 def check_config_exists():
-    eng = database.get_db_engine()
-    with eng.connect() as conn:
-        if conn.dialect.has_table(conn, 'config'):
-            if (conn.execute("SELECT COUNT(*) FROM config").fetchone()[0] > 0): # type: ignore
-                return True
-            else:
-                return False
-        else:
-            return False
+    return database.check_config_table()
 
 def load_version(app: Flask):
     if os.environ.get("SOURCE_VERSION"):
@@ -87,7 +79,7 @@ def setup_config(app: Flask):
         config = database.get_config_list()
         print("Loaded existing config")
     else:
-        config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20, 'entries_allowed': 1, 'theme': 'default'}
+        config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20, 'entries_allowed': 1, 'theme': 'default.css'}
         for key, value in config.items():
             database.set_config(key, value)
         print("Created new config")
