@@ -46,7 +46,7 @@
                     var items = [];
                     $.each(data, function (key, val) {
                         items.push("<tr><td>" + val[0] + `</td>
-                            <td><button type='button'
+                            <td class='buttoncell'><button type='button'
                                     class='btn btn-primary justify-content-center align-content-between enqueueButton'
                                     data-toggle='modal'
                                     data-target='#enqueueModal' onclick='setSelectedId(`+ val[1] + `)'><i
