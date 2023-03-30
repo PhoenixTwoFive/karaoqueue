@@ -75,3 +75,55 @@ table td:first-child {
         display: none;
     }
 }
+
+@media (prefers-color-scheme: dark) {
+
+    body {
+        background-color: #121212;
+        color: #f5f5f5;
+    }
+    
+    .footer {
+        background-color: #232323;
+    }
+
+    .modal-content {
+        background-color: #121212;
+        color: #f5f5f5;
+    }
+
+    .modal-header {
+        background-color: #121212;
+        color: #f5f5f5;
+        border-color: #232323;
+    }
+
+    .modal-footer {
+        background-color: #121212;
+        color: #f5f5f5;
+        border-color: #232323;
+    }
+
+    .form-control {
+        background-color: #343434;
+        color: #f5f5f5;
+    }
+
+    .form-control:focus {
+        background-color: #343434;
+        color: #f5f5f5;
+    }
+
+    .table td, .table th {
+        border-color: #232323;
+    }
+
+    .table thead th {
+        border-color: #232323;
+    }
+
+    .close {
+        color: #f5f5f5;
+    }
+    
+}
