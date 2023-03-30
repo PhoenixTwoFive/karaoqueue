@@ -76,6 +76,14 @@ def create_done_song_view():
                  SELECT CONCAT(Artist," - ", Title) AS Song, Plays AS Wiedergaben
                  FROM songs, done_songs
                  WHERE done_songs.Song_Id=songs.Id""")
+        
+
+def create_config_table():
+    with get_db_engine().connect() as conn:
+        conn.execute("""CREATE TABLE IF NOT EXISTS `config` (
+        `Key` VARCHAR(50) NOT NULL PRIMARY KEY,
+        `Value` TEXT
+    )""")
 
 
 def get_list():
@@ -177,7 +185,25 @@ def delete_entries(ids):
         return -1
 
 
-def delete_all_entries():
+def delete_all_entries() -> bool:
     with get_db_engine().connect() as conn:
         conn.execute("DELETE FROM entries")
     return True
+
+def get_config(key: str) -> str:
+    with get_db_engine().connect() as conn:
+        cur = conn.execute("SELECT `Value` FROM config WHERE `Key`=%s", (key,))
+    return cur.fetchall()[0][0]
+
+def set_config(key: str, value: str) -> bool:
+    with get_db_engine().connect() as conn:
+        conn.execute("INSERT INTO config (`Key`, `Value`) VALUES (%s,%s) ON DUPLICATE KEY UPDATE `Value`=%s", (key, value, value))
+    return True
+
+def get_config_list() -> dict:
+    with get_db_engine().connect() as conn:
+        cur = conn.execute("SELECT * FROM config")
+        result_dict = {}
+        for row in cur.fetchall():
+            result_dict[row[0]] = row[1]
+    return result_dict

@@ -3,9 +3,10 @@ from bs4 import BeautifulSoup
 import json
 import os
 import uuid
-from flask import make_response
+from flask import make_response, Flask
 from functools import wraps, update_wrapper
 from datetime import datetime
+import database
 
 data_directory = "data"
 config_file = data_directory+"/config.json"
@@ -33,9 +34,17 @@ def is_valid_uuid(val):
         return False
 
 def check_config_exists():
-    return os.path.isfile(config_file)
+    eng = database.get_db_engine()
+    with eng.connect() as conn:
+        if conn.dialect.has_table(conn, 'config'):
+            if (conn.execute("SELECT COUNT(*) FROM config").fetchone()[0] > 0): # type: ignore
+                return True
+            else:
+                return False
+        else:
+            return False
 
-def load_version(app):
+def load_version(app: Flask):
     if os.environ.get("SOURCE_VERSION"):
         app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[0:7] # type: ignore
     elif os.path.isfile(".version"):
@@ -48,7 +57,7 @@ def load_version(app):
     else:
         app.config['VERSION'] = ""
         
-def load_dbconfig(app):
+def load_dbconfig(app: Flask):
     if os.environ.get("FLASK_ENV") == "development":
         app.config['DBCONNSTRING'] = os.environ.get("DBSTRING")
     else:
@@ -70,29 +79,45 @@ def load_dbconfig(app):
                 else:
                     app.config['DBCONNSTRING'] = ""
         else:
-            app.config['DBCONNSTRING'] = ""
+            exit("No database connection string found. Cannot continue. Please set the environment variable DBSTRING or create a file .dbconn in the root directory of the project.")
 
-def setup_config(app):
-    if os.environ.get("DEPLOYMENT_PLATFORM") == "Docker":
-        app.config['BASIC_AUTH_USERNAME'] = os.environ.get('BASIC_AUTH_USERNAME')
-        app.config['BASIC_AUTH_PASSWORD'] = os.environ.get('BASIC_AUTH_PASSWORD')
-        app.config['ENTRY_QUOTA'] = os.environ.get('ENTRY_QUOTA')
-        app.config['MAX_QUEUE'] = os.environ.get('MAX_QUEUE')
+# Check if config exists in DB, if not, create it.
+def setup_config(app: Flask):
+    if check_config_exists():
+        config = database.get_config_list()
+        print("Loaded existing config")
     else:
-        if check_config_exists():
-            config = json.load(open(config_file))
-            with open(config_file, 'r') as handle:
-                config = json.load(handle)
-            print("Loaded existing config")
-        else:
-            config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20}
-            with open(config_file, 'w') as handle:
-                json.dump(config, handle, indent=4, sort_keys=True)
-            print("Wrote new config")
-        app.config['BASIC_AUTH_USERNAME'] = config['username']
-        app.config['BASIC_AUTH_PASSWORD'] = config['password']
-        app.config['ENTRY_QUOTA'] = config['entryquota']
-        app.config['MAX_QUEUE'] = config['maxqueue']
+        config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20, 'entries_allowed': 1}
+        for key, value in config.items():
+            database.set_config(key, value)
+        print("Created new config")
+    app.config['BASIC_AUTH_USERNAME'] = config['username']
+    app.config['BASIC_AUTH_PASSWORD'] = config['password']
+    app.config['ENTRY_QUOTA'] = config['entryquota']
+    app.config['MAX_QUEUE'] = config['maxqueue']
+    app.config['ENTRIES_ALLOWED'] = bool(config['entries_allowed'])
+
+# set queue admittance
+def set_accept_entries(app: Flask, allowed: bool):
+    if allowed:
+        app.config['ENTRIES_ALLOWED'] = True
+        database.set_config('entries_allowed', '1')
+    else:
+        app.config['ENTRIES_ALLOWED'] = False
+        database.set_config('entries_allowed', '0')
+
+# get queue admittance
+def get_accept_entries(app: Flask) -> bool:
+    state = bool(int(database.get_config('entries_allowed')))
+    app.config['ENTRIES_ALLOWED'] = state
+    return state
+
+
+# Write settings from current app.config to DB
+def persist_config(app: Flask):
+    config = {'username': app.config['BASIC_AUTH_USERNAME'], 'password': app.config['BASIC_AUTH_PASSWORD'], 'entryquota': app.config['ENTRY_QUOTA'], 'maxqueue': app.config['MAX_QUEUE']}
+    for key, value in config.items():
+        database.set_config(key, value)
 
 
 

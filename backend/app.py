@@ -42,7 +42,7 @@ def enqueue():
         database.add_entry(name, song_id, client_id)
         return Response('{"status":"OK"}', mimetype='text/json')
     else:
-        if accept_entries:
+        if helpers.get_accept_entries(app):
             if not request.json:
                 print(request.data)
                 abort(400)
@@ -90,6 +90,8 @@ def settings_post():
         app.config['MAX_QUEUE'] = int(maxqueue)  # type: ignore
     else:
         abort(400)
+
+    helpers.persist_config(app=app)
 
     return render_template('settings.html', app=app, auth=basic_auth.authenticate())
 
@@ -187,9 +189,8 @@ def mark_transferred(entry_id):
 @nocache
 @basic_auth.required
 def set_accept_entries(value):
-    global accept_entries
     if (value == '0' or value == '1'):
-        accept_entries = bool(int(value))
+        helpers.set_accept_entries(app,bool(int(value)))
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
@@ -198,7 +199,7 @@ def set_accept_entries(value):
 @app.route("/api/entries/accept")
 @nocache
 def get_accept_entries():
-    global accept_entries
+    accept_entries = helpers.get_accept_entries(app)
     return Response('{"status": "OK", "value": '+str(int(accept_entries))+'}', mimetype='text/json')
 
 
@@ -238,6 +239,7 @@ def activate_job():
     database.create_done_song_table()
     database.create_list_view()
     database.create_done_song_view()
+    database.create_config_table()
     helpers.setup_config(app)
 
 
