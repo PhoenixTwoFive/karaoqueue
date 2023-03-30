@@ -149,8 +149,8 @@ def add_sung_song(entry_id):
         stmt = text(
             "INSERT INTO done_songs (Song_Id,Plays) VALUES (:par_song_id,1) ON DUPLICATE KEY UPDATE Plays=Plays + 1;")
         conn.execute(stmt, {"par_song_id": song_id})  # type: ignore
-        delete_entry(entry_id)
         conn.commit()
+        delete_entry(entry_id)
     return True
 
 
@@ -185,6 +185,7 @@ def check_queue_length():
 def clear_played_songs():
     with get_db_engine().connect() as conn:
         conn.execute(text("DELETE FROM done_songs"))
+        conn.commit()
     return True
 
 
@@ -192,6 +193,7 @@ def delete_entry(id):
     with get_db_engine().connect() as conn:
         conn.execute(text("DELETE FROM entries WHERE id= :par_id"), {
                      "par_id": id})  # type: ignore
+        conn.commit()
     return True
 
 
@@ -203,7 +205,7 @@ def delete_entries(ids):
         with get_db_engine().connect() as conn:
             cur = conn.execute(text("DELETE FROM entries WHERE id= :par_id"), {
                                "par_id": idlist})
-
+            conn.commit()
         return cur.rowcount
     except Exception as error:
         return -1
