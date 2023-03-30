@@ -15,4 +15,9 @@ services:
   db:
     image: mariadb
     restart: always
-    env_file: .env
+    env_file: .env 
+    volumes:
+    - karaoqueue-db:/var/lib/mysql
+
+volumes:
+  karaoqueue-db:
