@@ -266,7 +266,7 @@ def add_header(response):
     and also to cache the rendered page for 10 minutes.
     """
     if not 'Cache-Control' in response.headers:
-        response.headers['Cache-Control'] = 'private, max-age=600'
+        response.headers['Cache-Control'] = 'private, max-age=600, no-cache, must-revalidate'
     return response
 
 @app.context_processor
