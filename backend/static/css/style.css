@@ -154,6 +154,10 @@ body {
     border-color: var(--table-border-color)
 }
 
+table td.buttoncell {
+    text-align: end;
+}
+
 .close {
     color: var(--text-color)
 }
