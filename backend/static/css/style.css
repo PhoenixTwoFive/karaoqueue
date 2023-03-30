@@ -126,4 +126,8 @@ table td:first-child {
         color: #f5f5f5;
     }
     
+    pre {
+        color: #a2a2a2;
+    }
+
 }
