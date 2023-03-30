@@ -11,7 +11,6 @@
         <input type="number" class="form-control" id="maxqueue" name="maxqueue" min=1 value={{app.config['MAX_QUEUE']}}>
     </p>
     <input type="submit" class="btn btn-primary mr-1 mb-2" value="Einstellungen anwenden">
-    <input type="button" class="btn btn-default mr-1 mb-2" onclick="$.post('/settings').done(()=>{alert('Einstellungen gespeichert')}).fail(()=>{alert('Fehler beim Speichern der Einstellungen')})" value="Einstellungen speichern"/>
 </form>
 {% endblock %}
 {% block extrajs %}
