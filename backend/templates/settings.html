@@ -10,8 +10,20 @@
         <label for="maxqueue">Maximale Anzahl an Einträgen Insgesamt</label>
         <input type="number" class="form-control" id="maxqueue" name="maxqueue" min=1 value={{app.config['MAX_QUEUE']}}>
     </p>
+    <p>
+        <label for="theme">Aktives Theme</label>
+        <select class="form-control" id="theme" name="theme">
+            {% for theme in themes %}
+            <option value="{{theme}}" {% if theme == config['THEME'] %}selected{% endif %}>{{theme}}</option>
+            {% endfor %}
+        </select>
+    </p>
     <input type="submit" class="btn btn-primary mr-1 mb-2" value="Einstellungen anwenden">
 </form>
+<details>
+    <summary>Current config:</summary>
+    <pre>{% for key, val in config.items() %}{{key}}: {{val}}<br>{% endfor %}</pre>
+</details>
 {% endblock %}
 {% block extrajs %}
 {% endblock %}

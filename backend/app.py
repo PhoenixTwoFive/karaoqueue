@@ -73,7 +73,7 @@ def songlist():
 @nocache
 @basic_auth.required
 def settings():
-    return render_template('settings.html', app=app, auth=basic_auth.authenticate())
+    return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes())
 
 
 @app.route("/settings", methods=['POST'])
@@ -82,12 +82,17 @@ def settings():
 def settings_post():
     entryquota = request.form.get("entryquota")
     maxqueue = request.form.get("maxqueue")
+    theme = request.form.get("theme")
     if entryquota.isnumeric() and int(entryquota) > 0:  # type: ignore
         app.config['ENTRY_QUOTA'] = int(entryquota)  # type: ignore
     else:
         abort(400)
     if maxqueue.isnumeric and int(maxqueue) > 0:  # type: ignore
         app.config['MAX_QUEUE'] = int(maxqueue)  # type: ignore
+    else:
+        abort(400)
+    if theme in helpers.get_themes():
+        app.config['THEME'] = theme
     else:
         abort(400)
 

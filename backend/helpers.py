@@ -87,7 +87,7 @@ def setup_config(app: Flask):
         config = database.get_config_list()
         print("Loaded existing config")
     else:
-        config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20, 'entries_allowed': 1}
+        config = {'username': 'admin', 'password': 'changeme', 'entryquota': 3, 'maxqueue': 20, 'entries_allowed': 1, 'theme': 'default'}
         for key, value in config.items():
             database.set_config(key, value)
         print("Created new config")
@@ -119,6 +119,20 @@ def persist_config(app: Flask):
     for key, value in config.items():
         database.set_config(key, value)
 
+# Get available themes from themes directory
+def get_themes():
+    themes = []
+    for theme in os.listdir('./static/css/themes'):
+        themes.append(theme)
+    return themes
+
+# Set theme
+def set_theme(app: Flask, theme: str):
+    if theme in get_themes():
+        app.config['THEME'] = theme
+        database.set_config('theme', theme)
+    else:
+        print("Theme not found, not setting theme.")
 
 
 def nocache(view):
