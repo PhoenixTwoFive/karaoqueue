@@ -75,7 +75,9 @@ def create_list_view():
         stmt = text("""CREATE OR REPLACE VIEW `Liste` AS
                  SELECT Name, Title, Artist, entries.Id AS entry_ID, songs.Id AS song_ID, entries.Transferred
                  FROM entries, songs
-                 WHERE entries.Song_Id=songs.Id""")
+                 WHERE entries.Song_Id=songs.Id
+                 ORDER BY entries.Id ASC
+                 """)
         conn.execute(stmt)
         conn.commit()
 
