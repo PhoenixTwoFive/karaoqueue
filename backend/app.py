@@ -1,5 +1,5 @@
 from flask import Flask, render_template, abort, request, redirect, send_from_directory, jsonify
-from flask.wrappers import Request, Response
+from flask.wrappers import Response
 import helpers
 import database
 import data_adapters
@@ -11,6 +11,7 @@ app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
 accept_entries = True
+
 
 @app.route("/")
 def home():
@@ -95,7 +96,7 @@ def settings_post():
     else:
         abort(400)
     if theme is not None and theme in helpers.get_themes():
-        helpers.set_theme(app,theme)
+        helpers.set_theme(app, theme)
     else:
         abort(400)
     if username != "" and username != app.config['BASIC_AUTH_USERNAME']:
@@ -143,7 +144,7 @@ def update_songs():
     return Response('{"status": "%s" }' % status, mimetype='text/json')
 
 
-@app.route("/api/songs/compl") # type: ignore
+@app.route("/api/songs/compl")  # type: ignore
 @nocache
 def get_song_completions(input_string=""):
     input_string = request.args.get('search', input_string)
@@ -176,7 +177,7 @@ def delete_entries():
         return
     updates = database.delete_entries(request.json)
     if updates >= 0:
-        return Response('{"status": "OK", "updates": '+str(updates)+'}', mimetype='text/json')
+        return Response('{"status": "OK", "updates": ' + str(updates) + '}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
 
@@ -189,6 +190,7 @@ def mark_sung(entry_id):
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
+
 
 @app.route("/api/entries/mark_transferred/<entry_id>")
 @nocache
@@ -205,7 +207,7 @@ def mark_transferred(entry_id):
 @basic_auth.required
 def set_accept_entries(value):
     if (value == '0' or value == '1'):
-        helpers.set_accept_entries(app,bool(int(value)))
+        helpers.set_accept_entries(app, bool(int(value)))
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
@@ -215,7 +217,7 @@ def set_accept_entries(value):
 @nocache
 def get_accept_entries():
     accept_entries = helpers.get_accept_entries(app)
-    return Response('{"status": "OK", "value": '+str(int(accept_entries))+'}', mimetype='text/json')
+    return Response('{"status": "OK", "value": ' + str(int(accept_entries)) + '}', mimetype='text/json')
 
 
 @app.route("/api/played/clear")
@@ -257,16 +259,16 @@ def activate_job():
     helpers.setup_config(app)
 
 
-
 @app.after_request
 def add_header(response):
     """
     Add headers to both force latest IE rendering engine or Chrome Frame,
     and also to cache the rendered page for 10 minutes.
     """
-    if not 'Cache-Control' in response.headers:
+    if 'Cache-Control' not in response.headers:
         response.headers['Cache-Control'] = 'private, max-age=600, no-cache, must-revalidate'
     return response
+
 
 @app.context_processor
 def inject_version():

@@ -1,7 +1,5 @@
 # -*- coding: utf_8 -*-
 
-from email.mime import base
-from MySQLdb import Connection
 from sqlalchemy import create_engine, engine, text
 import pandas
 from io import StringIO
@@ -209,7 +207,7 @@ def delete_entries(ids):
                                "par_id": idlist})
             conn.commit()
         return cur.rowcount
-    except Exception as error:
+    except Exception:
         return -1
 
 
@@ -227,7 +225,7 @@ def get_config(key: str) -> str:
                 text("SELECT `Value` FROM config WHERE `Key`= :par_key"), {"par_key": key})  # type: ignore
             conn.commit()
         return cur.fetchall()[0][0]
-    except IndexError as error:
+    except IndexError:
         return ""
 
 
@@ -256,7 +254,7 @@ def check_config_table() -> bool:
         if conn.dialect.has_table(conn, 'config'):
             # type: ignore
             # type: ignore
-            if (conn.execute(text("SELECT COUNT(*) FROM config")).fetchone()[0] > 0): # type: ignore
+            if (conn.execute(text("SELECT COUNT(*) FROM config")).fetchone()[0] > 0):  # type: ignore
                 return True
             else:
                 return False

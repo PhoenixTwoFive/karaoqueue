@@ -1,5 +1,5 @@
 def dict_from_rows(rows):
-    outlist=[]
+    outlist = []
     for row in rows:
         outlist.append(dict(row._mapping))
     return outlist

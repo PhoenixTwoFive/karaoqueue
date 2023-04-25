@@ -4,15 +4,16 @@ on:
   push:
     paths:
       - '*.py'
+  pull_request:
 
 jobs:
   flake8_py3:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4.6.0
         with:
-          python-version: 3.7.4
+          python-version: 3.10
           architecture: x64
       - name: Checkout PyTorch
         uses: actions/checkout@master

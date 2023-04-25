@@ -1,12 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-import json
 import os
 import uuid
 from flask import make_response, Flask
 from functools import wraps, update_wrapper
 from datetime import datetime
 import database
+
 
 def get_catalog_url():
     r = requests.get('https://www.karafun.de/karaoke-song-list.html')
@@ -69,13 +69,15 @@ def load_dbconfig(app: Flask):
                 else:
                     app.config['DBCONNSTRING'] = ""
         else:
-            exit("No database connection string found. Cannot continue. Please set the environment variable DBSTRING or create a file .dbconn in the root directory of the project.")
+            exit("""No database connection string found. Cannot continue.
+                 Please set the environment variable DBSTRING or
+                 create a file .dbconn in the root directory of the project.""")
 
 # Check if config exists in DB, if not, create it.
 
 
 def setup_config(app: Flask):
-    if check_config_exists() == False:
+    if check_config_exists() is False:
         print("No config found, creating new config")
         initial_username = os.environ.get("INITIAL_USERNAME")
         initial_password = os.environ.get("INITIAL_PASSWORD")
