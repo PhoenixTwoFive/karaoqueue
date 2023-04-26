@@ -98,6 +98,7 @@ def setup_config(app: Flask):
         for key, value in default_config.items():
             database.set_config(key, value)
         print("Created new config")
+        database.init_event_id()
     config = database.get_config_list()
     app.config['BASIC_AUTH_USERNAME'] = config['username']
     app.config['BASIC_AUTH_PASSWORD'] = config['password']
@@ -105,6 +106,7 @@ def setup_config(app: Flask):
     app.config['MAX_QUEUE'] = config['maxqueue']
     app.config['ENTRIES_ALLOWED'] = bool(config['entries_allowed'])
     app.config['THEME'] = config['theme']
+    app.config['EVENT_ID'] = database.get_event_id()
 
 # set queue admittance
 
@@ -151,6 +153,15 @@ def set_theme(app: Flask, theme: str):
         database.set_config('theme', theme)
     else:
         print("Theme not found, not setting theme.")
+
+
+def get_current_event_id(app: Flask):
+    return app.config['EVENT_ID']
+
+
+def reset_current_event_id(app: Flask):
+    database.reset_event_id()
+    app.config['EVENT_ID'] = database.get_event_id()
 
 
 def nocache(view):

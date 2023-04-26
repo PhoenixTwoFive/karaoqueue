@@ -108,7 +108,7 @@
     {% block extrajs %}{% endblock %}
     <script>
         $(document).ready(function () {
-            loadOrGenerateClientId()
+            checkEventID()
             // get current URL path and assign 'active' class
             var pathname = window.location.pathname;
             $('.navbar-nav > li > a[href="' + pathname + '"]').parent().addClass('active');
@@ -128,6 +128,23 @@
         function loadOrGenerateClientId() {
             if (!localStorage.getItem("clientId")) {
                 localStorage.setItem("clientId", create_UUID())
+            }
+        }
+
+        function getClientId() {
+            return localStorage.getItem("clientId")
+        }
+
+        async function checkEventID() {
+            const localEventID = localStorage.getItem("eventID")
+            const resp = await fetch("/api/events/current")
+            const respJson = await resp.json()
+            const remoteEventID = respJson.event
+
+            if (localEventID == null || localEventID != remoteEventID) {
+                localStorage.clear()
+                localStorage.setItem("eventID", remoteEventID)
+                loadOrGenerateClientId()
             }
         }
     </script>

@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, engine, text
 import pandas
 from io import StringIO
 from flask import current_app
+import uuid
 
 song_table = "songs"
 entry_table = "entries"
@@ -16,7 +17,6 @@ sql_engine = None
 def get_db_engine() -> engine.base.Engine:
     global sql_engine
     if (not sql_engine):
-        print(current_app.config.get("DBCONNSTRING"))
         sql_engine = create_engine(
             current_app.config.get("DBCONNSTRING"))  # type: ignore
     return sql_engine
@@ -189,6 +189,26 @@ def clear_played_songs():
     return True
 
 
+def get_entry(id):
+    try:
+        with get_db_engine().connect() as conn:
+            cur = conn.execute(text("SELECT * FROM Liste WHERE entry_ID = :par_id"),
+                               {"par_id": id})  # type: ignore
+        return cur.fetchall()[0]
+    except Exception:
+        return None
+
+
+def get_raw_entry(id):
+    try:
+        with get_db_engine().connect() as conn:
+            cur = conn.execute(text("SELECT * FROM entries WHERE ID = :par_id"),
+                               {"par_id": id})  # type: ignore
+        return cur.fetchall()[0]
+    except Exception:
+        return None
+
+
 def delete_entry(id):
     with get_db_engine().connect() as conn:
         conn.execute(text("DELETE FROM entries WHERE id= :par_id"), {
@@ -260,3 +280,18 @@ def check_config_table() -> bool:
                 return False
         else:
             return False
+
+
+def init_event_id() -> bool:
+    if not get_config("EventID"):
+        set_config("EventID", str(uuid.uuid4()))
+    return True
+
+
+def reset_event_id() -> bool:
+    set_config("EventID", str(uuid.uuid4()))
+    return True
+
+
+def get_event_id() -> str:
+    return get_config("EventID")

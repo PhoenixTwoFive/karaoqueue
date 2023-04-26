@@ -138,6 +138,7 @@ def songs():
 @basic_auth.required
 def update_songs():
     database.delete_all_entries()
+    helpers.reset_current_event_id(app)
     status = database.import_songs(
         helpers.get_songs(helpers.get_catalog_url()))
     print(status)
@@ -149,7 +150,6 @@ def update_songs():
 def get_song_completions(input_string=""):
     input_string = request.args.get('search', input_string)
     if input_string != "":
-        print(input_string)
         result = [list(x) for x in database.get_song_completions(input_string=input_string)]
         return jsonify(result)
 
@@ -157,10 +157,29 @@ def get_song_completions(input_string=""):
         return 400
 
 
-@app.route("/api/entries/delete/<entry_id>")
+@app.route("/api/entries/delete/<entry_id>", methods=['GET'])
 @nocache
 @basic_auth.required
-def delete_entry(entry_id):
+def delete_entry_admin(entry_id):
+    if database.delete_entry(entry_id):
+        return Response('{"status": "OK"}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json')
+
+
+@app.route("/api/entries/delete/<entry_id>", methods=['POST'])
+@nocache
+def delete_entry_user(entry_id):
+    if not request.json:
+        print(request.data)
+        abort(400)
+    client_id = request.json['client_id']
+    if not helpers.is_valid_uuid(client_id):
+        print(request.data)
+        abort(400)
+    if database.get_raw_entry(entry_id)['client_id'] != client_id:  # type: ignore
+        print(request.data)
+        abort(403)
     if database.delete_entry(entry_id):
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
@@ -235,6 +254,7 @@ def clear_played_songs():
 @basic_auth.required
 def delete_all_entries():
     if database.delete_all_entries():
+        helpers.reset_current_event_id(app)
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
@@ -244,6 +264,12 @@ def delete_all_entries():
 @basic_auth.required
 def admin():
     return redirect("/", code=303)
+
+
+@app.route("/api/events/current")
+@nocache
+def get_current_event():
+    return Response('{"status": "OK", "event": "' + helpers.get_current_event_id(app) + '"}', mimetype='text/json')
 
 
 @app.before_first_request

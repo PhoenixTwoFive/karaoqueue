@@ -79,7 +79,7 @@
         $.ajax({
             type: 'POST',
             url: '/api/enqueue',
-            data: JSON.stringify(data), // or JSON.stringify ({name: 'jonas'}),
+            data: JSON.stringify(data),
             success: success_callback,
             statusCode: {
                 423: blocked_callback
@@ -99,6 +99,7 @@
         enqueue(localStorage.getItem("clientId"),id, name, function () {
             $("#enqueueModal").modal('hide');
             window.location.href = '/#end';
+            
         }, function (response) {
             bootbox.alert({
                 message: "Deine Eintragung konnte leider nicht vorgenommen werden.\nGrund: "+response.responseJSON.status,
