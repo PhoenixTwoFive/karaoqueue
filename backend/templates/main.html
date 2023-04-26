@@ -17,6 +17,7 @@
             <th data-field="Name">Name</th>
             <th data-field="Title">Song</th>
             <th data-field="Artist">Künstler</th>
+            <th scope="col" data-formatter="TableActionsFormatter"></th>
         </tr>
     </thead>
 </table>
@@ -34,5 +35,37 @@ $.getJSON("/api/entries/accept", (data) => {
                 $('[data-toggle="tooltip"]').tooltip()
     }
 })
+
+function TableActionsFormatter(value,row,index) {
+    console.log("Value: " + value + ", Row: " + row + ", Index: " + index)
+    console.log(row)
+    if (getOwnedEntries().includes(row.entry_ID)) {
+      return "<button type='button' class='btn btn-danger' data-toggle='tooltip' data-placement='top' title='Eintrag zurückziehen' onclick=\"event.stopPropagation();$(this).tooltip('dispose');requestDeletionAsUser("+row["entry_ID"]+")\"><i class='fas fa-trash'></i></button>"
+    }
+    return ""
+}
+
+function requestDeletionAsUser(id) {
+  bootbox.confirm("Wirklich den Eintrag zurückziehen? Das könnte zu einer langen Wartezeit führen!", function (result) {
+    if (result) {
+        payload = {
+            "client_id": localStorage.getItem("clientId"),
+            "entry_id": id
+        }
+        $.ajax({
+            url: "/api/entries/delete/"+id,
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function(result) {
+                bootbox.alert("Eintrag zurückgezogen!")
+                location.reload()
+            }
+        })
+    }
+  })
+}
+
 </script>
 {% endblock %}

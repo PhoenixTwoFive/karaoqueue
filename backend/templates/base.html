@@ -147,6 +147,29 @@
                 loadOrGenerateClientId()
             }
         }
+
+        function addEntry(entryId) {
+          entryArray = JSON.parse(localStorage.getItem("ownedEntries"))
+          if (entryArray == null) {
+            entryArray = []
+          }
+          entryArray.push(entryId)
+          localStorage.setItem("ownedEntries", JSON.stringify(entryArray))
+        }
+
+        function removeEntry(entryId) {
+          entryArray = JSON.parse(localStorage.getItem("ownedEntries"))
+          if (entryArray == null) {
+            entryArray = []
+          }
+          entryArray = entryArray.filter(function(value, index, arr){ return value != entryId;});
+          localStorage.setItem("ownedEntries", JSON.stringify(entryArray))
+        }
+
+        function getOwnedEntries() {
+          return JSON.parse(localStorage.getItem("ownedEntries"))
+        }
+
     </script>
 </body>
 

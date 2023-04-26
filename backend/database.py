@@ -134,11 +134,11 @@ def get_song_completions(input_string):
 def add_entry(name, song_id, client_id):
     with get_db_engine().connect() as conn:
         stmt = text(
-            "INSERT INTO entries (Song_Id,Name,Client_Id) VALUES (:par_song_id,:par_name,:par_client_id);")
-        conn.execute(stmt, {"par_song_id": song_id, "par_name": name,
-                     "par_client_id": client_id})  # type: ignore
+            "INSERT INTO entries (Song_Id,Name,Client_Id) VALUES (:par_song_id,:par_name,:par_client_id) RETURNING entries.ID;")
+        cur = conn.execute(stmt, {"par_song_id": song_id, "par_name": name,
+                                  "par_client_id": client_id})  # type: ignore
         conn.commit()
-    return True
+    return cur.fetchone()[0]  # type: ignore
 
 
 def add_sung_song(entry_id):

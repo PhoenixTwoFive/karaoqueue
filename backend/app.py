@@ -40,8 +40,8 @@ def enqueue():
     name = request.json['name']
     song_id = request.json['id']
     if request.authorization:
-        database.add_entry(name, song_id, client_id)
-        return Response('{"status":"OK"}', mimetype='text/json')
+        entry_id = database.add_entry(name, song_id, client_id)
+        return Response(f"""{{"status":"OK", "entry_id":{entry_id}}}""", mimetype='text/json')
     else:
         if helpers.get_accept_entries(app):
             if not request.json:
@@ -55,8 +55,8 @@ def enqueue():
             song_id = request.json['id']
             if database.check_queue_length() < int(app.config['MAX_QUEUE']):
                 if database.check_entry_quota(client_id) < int(app.config['ENTRY_QUOTA']):
-                    database.add_entry(name, song_id, client_id)
-                    return Response('{"status":"OK"}', mimetype='text/json')
+                    entry_id = database.add_entry(name, song_id, client_id)
+                    return Response(f"""{{"status":"OK", "entry_id":{entry_id}}}""", mimetype='text/json')
                 else:
                     return Response('{"status":"Du hast bereits ' + str(database.check_entry_quota(client_id)) + ' Songs eingetragen, dies ist das Maximum an Einträgen die du in der Warteliste haben kannst."}', mimetype='text/json', status=423)
             else:
@@ -177,7 +177,7 @@ def delete_entry_user(entry_id):
     if not helpers.is_valid_uuid(client_id):
         print(request.data)
         abort(400)
-    if database.get_raw_entry(entry_id)['client_id'] != client_id:  # type: ignore
+    if database.get_raw_entry(entry_id)[3] != client_id:  # type: ignore
         print(request.data)
         abort(403)
     if database.delete_entry(entry_id):

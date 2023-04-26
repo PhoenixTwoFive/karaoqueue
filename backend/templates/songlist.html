@@ -96,10 +96,16 @@
     function submitModal() {
         var name = $("#singerNameInput").val();
         var id = $("#selectedId").attr("value");
-        enqueue(localStorage.getItem("clientId"),id, name, function () {
+        enqueue(localStorage.getItem("clientId"),id, name, function (response) {
+            console.log(response);
+            entryID = response["entry_id"];
+            bootbox.alert({
+                message: "Deine Eintragung wurde erfolgreich vorgenommen.",
+            });
+            console.log("Entry ID: " + entryID);
+            addEntry(entryID);
             $("#enqueueModal").modal('hide');
             window.location.href = '/#end';
-            
         }, function (response) {
             bootbox.alert({
                 message: "Deine Eintragung konnte leider nicht vorgenommen werden.\nGrund: "+response.responseJSON.status,
