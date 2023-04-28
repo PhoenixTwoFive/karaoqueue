@@ -185,8 +185,6 @@
         });
     }
     function TableActions(value, row, index) {
-        console.log("Value: " + value + ", Row: " + row + ", Index: " + index)
-        console.log(row)
         let outerHTML = ""
         if (row.Transferred == 1) {
             outerHTML = "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Markierung zurückziehen\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsTransferred(" + row.entry_ID + ")\"><i class=\"fas fa-backward\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsSung(" + row.entry_ID + ")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');confirmDeleteEntry('" + row.Name + "'," + row.entry_ID + ")\"><i class=\"fas fa-trash\"></i></button>";
@@ -197,7 +195,7 @@
     }
 
     function CopyFormatter(value, row, index) {
-        return "<span data-toggle='tooltip' data-placement='right' title='📋' onclick='event.stopPropagation();$(this).tooltip(\"dispose\");copyAndNotify(\""+value+"\")'>"+value+"</span>";
+        return "<span onclick='copyAndNotify(\""+value+"\")'>"+value+"</span>";
     }
 
     function getIdSelections() {
