@@ -6,7 +6,7 @@ secrets:
 
 services:
   karaoqueue:
-    image: "ghcr.io/phoenixtwofive/karaoqueue:v2023.03.3"
+    image: "ghcr.io/phoenixtwofive/karaoqueue:v2023.04"
     build: .
     restart: always
     ports:
