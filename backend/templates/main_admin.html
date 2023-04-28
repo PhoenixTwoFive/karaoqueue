@@ -26,9 +26,9 @@
         <thead>
             <tr>
                 <th data-field="state" data-checkbox="true"></th>
-                <th scope="col" data-field="Name">Name</th>
-                <th scope="col" data-field="Title">Song</th>
-                <th scope="col" data-field="Artist">Künstler</th>
+                <th scope="col" data-field="Name" data-formatter="CopyFormatter">Name</th>
+                <th scope="col" data-field="Title"data-formatter="CopyFormatter">Song</th>
+                <th scope="col" data-field="Artist"data-formatter="CopyFormatter">Künstler</th>
                 <th scope="col" data-formatter="TableActions">Aktionen</th>
             </tr>
         </thead>
@@ -185,8 +185,6 @@
         });
     }
     function TableActions(value, row, index) {
-        console.log("Value: " + value + ", Row: " + row + ", Index: " + index)
-        console.log(row)
         let outerHTML = ""
         if (row.Transferred == 1) {
             outerHTML = "<button type=\"button\" class=\"btn btn-default\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Markierung zurückziehen\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsTransferred(" + row.entry_ID + ")\"><i class=\"fas fa-backward\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-success\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Als gesungen markieren\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');markEntryAsSung(" + row.entry_ID + ")\"><i class=\"fas fa-check\"></i></button>&nbsp;<button type=\"button\" class=\"btn btn-danger\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eintrag löschen\" onclick=\"event.stopPropagation();$(this).tooltip('dispose');confirmDeleteEntry('" + row.Name + "'," + row.entry_ID + ")\"><i class=\"fas fa-trash\"></i></button>";
@@ -196,10 +194,26 @@
         return outerHTML;
     }
 
+    function CopyFormatter(value, row, index) {
+        return "<span onclick='copyAndNotify(\""+value+"\")'>"+value+"</span>";
+    }
+
     function getIdSelections() {
         return $.map($("#entrytable").bootstrapTable('getSelections'), function (row) {
             return row.entry_ID
         })
+    }
+
+    function copyAndNotify(text) {
+        navigator.clipboard.writeText(text).then(function () {
+            let toast = {
+                title: "Kopiert",
+                message: text,
+                status: 1,
+                timeout: 5000
+              };
+            Toast.create(toast);
+            })
     }
 </script>
 {% endblock %}

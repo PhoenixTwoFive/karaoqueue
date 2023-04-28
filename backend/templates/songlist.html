@@ -99,9 +99,13 @@
         enqueue(localStorage.getItem("clientId"),id, name, function (response) {
             console.log(response);
             entryID = response["entry_id"];
-            bootbox.alert({
-                message: "Deine Eintragung wurde erfolgreich vorgenommen.",
-            });
+            toast = {
+                title: "Erfolgreich eingetragen",
+                message: "Du wurdest erfolgreich eingetragen.",
+                status: TOAST_STATUS.SUCCESS,
+                timeout: 5000
+            }
+            Toast.create(toast);
             console.log("Entry ID: " + entryID);
             addEntry(entryID);
             $("#enqueueModal").modal('hide');
