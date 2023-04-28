@@ -169,7 +169,11 @@
         }
 
         function getOwnedEntries() {
-          return JSON.parse(localStorage.getItem("ownedEntries"))
+          var entries = JSON.parse(localStorage.getItem("ownedEntries"))
+          if (entries == null) {
+            entries = []
+          }
+          return entries;
         }
 
     </script>
