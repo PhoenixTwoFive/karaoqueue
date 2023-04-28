@@ -59,7 +59,13 @@ function requestDeletionAsUser(id) {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(result) {
-                bootbox.alert("Eintrag zurückgezogen!")
+                toast = {
+                  title: "Erfolgreich zurückgezogen",
+                  message: "Eintrag wurde gelöscht",
+                  status: TOAST_STATUS.SUCCESS,
+                  timeout: 5000
+                }
+                Toast.create(toast);
                 location.reload()
             }
         })

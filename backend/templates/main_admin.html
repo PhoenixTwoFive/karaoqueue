@@ -26,9 +26,9 @@
         <thead>
             <tr>
                 <th data-field="state" data-checkbox="true"></th>
-                <th scope="col" data-field="Name">Name</th>
-                <th scope="col" data-field="Title">Song</th>
-                <th scope="col" data-field="Artist">Künstler</th>
+                <th scope="col" data-field="Name" data-formatter="CopyFormatter">Name</th>
+                <th scope="col" data-field="Title"data-formatter="CopyFormatter">Song</th>
+                <th scope="col" data-field="Artist"data-formatter="CopyFormatter">Künstler</th>
                 <th scope="col" data-formatter="TableActions">Aktionen</th>
             </tr>
         </thead>
@@ -196,10 +196,26 @@
         return outerHTML;
     }
 
+    function CopyFormatter(value, row, index) {
+        return "<span data-toggle='tooltip' data-placement='right' title='📋' onclick='event.stopPropagation();$(this).tooltip(\"dispose\");copyAndNotify(\""+value+"\")'>"+value+"</span>";
+    }
+
     function getIdSelections() {
         return $.map($("#entrytable").bootstrapTable('getSelections'), function (row) {
             return row.entry_ID
         })
+    }
+
+    function copyAndNotify(text) {
+        navigator.clipboard.writeText(text).then(function () {
+            let toast = {
+                title: "Kopiert",
+                message: text,
+                status: 1,
+                timeout: 5000
+              };
+            Toast.create(toast);
+            })
     }
 </script>
 {% endblock %}
