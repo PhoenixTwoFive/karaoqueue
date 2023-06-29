@@ -67,6 +67,9 @@
             e.preventDefault();
             submitModal();
         });
+        $('#enqueueModal').on('shown.bs.modal', function (e) {
+            $("#singerNameInput").focus();
+        })
     });
 
 
