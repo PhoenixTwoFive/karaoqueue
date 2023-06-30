@@ -91,8 +91,8 @@ def setup_config(app: Flask):
             exit()
         default_config = {'username': initial_username,
                           'password': initial_password,
-                          'entryquota': 3,
-                          'maxqueue': 20,
+                          'entryquota': 2,
+                          'maxqueue': 10,
                           'entries_allowed': 1,
                           'theme': 'default.css'}
         for key, value in default_config.items():
