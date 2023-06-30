@@ -37,7 +37,7 @@ def enqueue():
     if not helpers.is_valid_uuid(client_id):
         print(request.data)
         abort(400)
-    name = request.json['name']
+    name = request.json['name'].strip()
     song_id = request.json['id']
     if request.authorization:
         entry_id = database.add_entry(name, song_id, client_id)
