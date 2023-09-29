@@ -4,6 +4,7 @@ import { Song } from './models/song.model';
 import { Artist } from './models/artist.model';
 import { Genre } from './models/genre.model';
 import { Language } from './models/language.model';
+import { RuntimeConfigLoaderService} from 'runtime-config-loader';
  
 import { Observable } from 'rxjs';
 
@@ -25,11 +26,11 @@ export class SongServiceService {
 
     let out = new Array<Song>();
 
-    this.http.get(this.api +"/songs/compl?search="+text).subscribe((data: Observable<JSON>) => {
+/*    this.http.get(this.api +"/songs/compl?search="+text).subscribe((data: JSON) => {
       data.forEach(element => {
         out.push(new Song(element["title"],element["artist"],element["karafun_id"],element["duo"],element["explicit"],element["_id"],element["styles"],element["languages"]));
       });
-    });
+    });*/
 
     const observable = new Observable<Array<Song>>( subscriber => {
       subscriber.next(out);

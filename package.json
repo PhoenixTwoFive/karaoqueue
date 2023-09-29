@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "runtime-config-loader": "^5.0.2"
+  }
+}

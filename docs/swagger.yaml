@@ -9,41 +9,9 @@ servers:
     description: Production API    
 
 paths:
-  /queue:
-    get:
-      summary: 'Fetch entry Queue content'
-      description: 'Fetch entry Queue'
-      parameters:
-        - name: index
-          in: query
-          description: Position from which on to return results
-          required: false
-          schema: 
-            type: integer
-        - name: limit
-          in: query
-          description: How many items to return at one time (max 100, default 20)
-          required: false
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/QueueEntry'
-        '400':
-          description: Invalid request. Check your parameters.
-        '404':
-          description: No Entries found in specified range.
-        '5XX':
-          description: Unexpected error.
+  /api/enqueue:
     post:
-      description: 'Add entry to Queue'
-      summary: 'Add entry to Queue'
+      summary: "Enqueue a song"
       requestBody:
         required: true
         content:
@@ -51,342 +19,215 @@ paths:
             schema:
               type: object
               properties:
-                singer_name:
+                client_id:
                   type: string
-                song_id:
-                  type: integer
+                name:
+                  type: string
+                id:
+                  type: string
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  entry_id:
-                    type: string
-                    format: bson.ObjectID
-                    pattern: '/^[a-f\d]{24}$/i'
-                  entry_auth:
-                    type: string
+          description: "Song enqueued successfully"
         '400':
-          description: Malformed request.
-        '405':
-          description: Currently not accepting entries.
-    delete:
-      summary: 'Clear queue'
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK. Successfully cleared Queue
-        '401':
-          description: Not Authorized
-      
-      description: clear queue
-  /queue/{entry_id}:
-    get:
-      summary: GET single queue entry
-      parameters:
-        - in: path
-          name: entry_id
-          schema:
-            type: integer
-          required: true
-          description: ID of the Entry to get
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/QueueEntry'
-    patch:
-      summary: Change entry
-      security:
-        - cookieAuth: []      
-      parameters:
-        - in: path
-          name: entry_id
-          schema:
-            type: string
-            format: bson.ObjectID
-            pattern: '/^[a-f\d]{24}$/i'
-          required: true
-          description: >
-            ID of the entry to modify. One of the following is needed:
-              - Proper Bearer-Token authorization
-              - The entry_auth string corresponding to the entry
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema: 
-              type: object
-              required:
-                - entry_auth
-              properties:
-                singer_name:
-                  type: string
-                song_id:
-                  type: integer
-                entry_auth:
-                  type: string
-      responses:
-        '200':
-          description: OK
-        '404':
-          description: Entry not found
-        '405':
-          description: Method not allowed. Check your entry_auth or authorization.
-    delete:
-      summary: 'Delete entry'
-      security:
-        - cookieAuth: []
-      parameters:
-        - in: path
-          name: entry_id
-          schema:
-            type: string
-            format: bson.ObjectID
-            pattern: '/^[a-f\d]{24}$/i'
-          required: true
-          description: >
-            ID of the entry to modify.  One of the following is needed:
-              - Proper Bearer-Token authorization
-              - The entry_auth string corresponding to the entry
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - entry_auth
-              properties:
-                entry_auth:
-                  type: string
-      responses:
-        '200':
-          description: OK
-        '404':
-          description: Entry not found
-        '405':
-          description: Method not allowed. Check your entry_auth or authorization.
+          description: "Bad request, JSON is required"
+        '423':
+          description: "Cannot enqueue, conditions not met"
 
-
-  /songs:
+  /api/queue:
     get:
-      summary: Search in Songs
-      parameters:
-        - in: query
-          name: query
-          schema:
-            type: string
-          required: true
-        - name: limit
-          in: query
-          description: How many items to return at one time (max 100, default 20)
-          required: false
-          schema:
-            type: integer
+      summary: "Get the queue"
       responses:
         '200':
-          description: OK. An array of Songs according to the Query string.
+          description: "Queue retrieved successfully"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SongEntry'
-        '400':
-          description: Malformed Request
-    put:
-      summary: Update Song Database
-      description: >
-        Trigger an update of the database using the source CSV defined
-        in the config.
-      security:
-        - cookieAuth: []
-      responses:
-        '200': 
-          description: OK. Songs have been updated
-        '401':
-          description: Authorization required. Check your auth.
-  /statistics:
+                  type: object
+
+  /api/songs:
     get:
-      summary: Statistics about the Database
+      summary: "Get the list of songs"
       responses:
         '200':
-          description: Statistics as JSON
+          description: "List of songs retrieved successfully"
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  num_songs:
-                    type: integer
-                  num_entries:
-                    type: integer
+                type: array
+                items:
+                  type: object
 
-  /auth/login:
+  /api/songs/update:
+    get:
+      summary: "Update the list of songs"
+      responses:
+        '200':
+          description: "Songs updated successfully"
+        '400':
+          description: "Bad request"
+
+  /api/songs/compl:
+    get:
+      summary: "Get song completions"
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Song completions retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          description: "Bad request"
+
+  /api/entries/delete/{entry_id}:
+    get:
+      summary: "Admin deletes an entry"
+      parameters:
+        - name: entry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Entry deleted successfully"
+        '400':
+          description: "Entry deletion failed"
+
     post:
-      summary: Logs in and returns the authentication  cookie
+      summary: "User deletes an entry"
+      parameters:
+        - name: entry_id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
-        description: A JSON object containing the login and password.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
-      security: []    # no authentication
+              type: object
+              properties:
+                client_id:
+                  type: string
       responses:
         '200':
-          description: >
-            Successfully authenticated.
-            The session ID is returned in a cookie named `jwt`. You need to include this cookie in subsequent requests.
-          headers: 
-            Set-Cookie:
-              schema: 
+          description: "Entry deleted successfully"
+        '400':
+          description: "Bad request, JSON is required"
+        '403':
+          description: "Forbidden, client_id mismatch"
+
+  /api/entries/delete:
+    post:
+      summary: "Delete multiple entries"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
                 type: string
-                example: jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiJhZG1pbiIsImlhdCI6MTYwMTY1MDYwNSwiZXhwIjoxNjAxNjU0MjA1fQ.uGvOlBAZdbPT8U9s7jEt5PUWyxLrpgaf02EoPVC_Zlsd; Path=/; HttpOnly
-  /auth/logout:
-    get:
-      summary: Logs the user out and invalidates the session on the server
-      security:
-        - cookieAuth: []
       responses:
         '200':
-          description: OK.
-        '401':
-          description: Authorization required.
+          description: "Entries deleted successfully"
+        '400':
+          description: "Bad request, JSON is required"
 
-  /rpc/end_event:
+  /api/entries/mark_sung/{entry_id}:
     get:
-      summary: End the current event
-      description: Locks entries and does not allow reopening without reset
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK.
-        
-  /rpc/start_event:
-    get:
-      summary: Start new event. Clears entries and stats.
-      description: Sets up a clean state.
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK.
-  
-  /rpc/enable_registration:
-    get:
-      summary: Enables registration in the queue
-      description: Makes it possible for guests to register in the queue.
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK.
-      
-    
-  /rpc/disable_registration:
-    get:
-      summary: Disables registration in the queue
-      description: Makes it impossible for guests to register in the queue.
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK.
-
-  /rpc/get_playstats:
-    get:
-      summary: Get stats of played songs in the current event.
-      description: Returns the stats for the current evening as JSON
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK.
-
-  /rpc/download_playstats:
-    get:
-      summary: Get stats of played songs in the current event for download.
-      description: Returns the stats for the current evening as PDF (for example for GEMA)
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK.
-
-  /rpc/entry_fulfilled:
-    get:
-      summary: Mark an entry as fulfilled.
-      description:  Mark an entry as fulfilled. This adds it to the statistics.
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: OK.
+      summary: "Mark an entry as sung"
       parameters:
-        - in: query
-          name: entry_id
+        - name: entry_id
+          in: path
+          required: true
           schema:
             type: string
-          description: The id of the entry to mark as done.
+      responses:
+        '200':
+          description: "Entry marked as sung successfully"
+        '400':
+          description: "Marking entry as sung failed"
 
+  /api/entries/mark_transferred/{entry_id}:
+    get:
+      summary: "Toggle transferred status of an entry"
+      parameters:
+        - name: entry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Entry transferred status toggled successfully"
+        '400':
+          description: "Toggling transferred status failed"
 
+  /api/entries/accept/{value}:
+    get:
+      summary: "Set accept entries status"
+      parameters:
+        - name: value
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Accept entries status set successfully"
+        '400':
+          description: "Setting accept entries status failed"
+
+  /api/entries/accept:
+    get:
+      summary: "Get accept entries status"
+      responses:
+        '200':
+          description: "Accept entries status retrieved successfully"
+
+  /api/played/clear:
+    get:
+      summary: "Clear played songs"
+      responses:
+        '200':
+          description: "Played songs cleared successfully"
+        '400':
+          description: "Clearing played songs failed"
+
+  /api/entries/delete_all:
+    get:
+      summary: "Delete all entries"
+      responses:
+        '200':
+          description: "All entries deleted successfully"
+        '400':
+          description: "Deleting all entries failed"
+
+  /api/events/current:
+    get:
+      summary: "Get the current event"
+      responses:
+        '200':
+          description: "Current event retrieved successfully"
+
+security:
+  - BasicAuth: []
 
 components:
   securitySchemes:
-    cookieAuth:         # arbitrary name for the security scheme; will be used in the "security" key later
-      type: apiKey
-      in: cookie
-      name: jwt  # cookie name
-  schemas:
-    QueueEntry:
-      type: object
-      properties:
-        _id:
-          type: string
-          format: bson.ObjectID
-          pattern: '/^[a-f\d]{24}$/i'
-        singer_name:
-          type: string
-        song_id:
-          type: integer
-    SongEntry:
-      type: object
-      properties:
-        id:
-          type: integer
-        title:
-          type: string
-        artist:
-          type: string
-        year:
-          type: integer
-        duet:
-          type: boolean
-        explicit:
-          type: boolean
-        styles:
-          type: array
-          items:
-            type: string
-        languages:
-          type: array
-          items:
-            type: string
-    LoginRequest:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-          format: password
-        
+    BasicAuth:
+      type: http
+      scheme: basic

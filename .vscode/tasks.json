@@ -23,7 +23,6 @@
             "type": "shell",
             "command": "docker-compose -f docker-compose.yml up --remove-orphans",
             "isBackground": true,
-            "activeOnStart": false
         }
     ]
 }

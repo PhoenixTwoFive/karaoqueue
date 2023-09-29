@@ -272,17 +272,17 @@ def get_current_event():
     return Response('{"status": "OK", "event": "' + helpers.get_current_event_id(app) + '"}', mimetype='text/json')
 
 
-@app.before_first_request
 def activate_job():
-    helpers.load_dbconfig(app)
-    helpers.load_version(app)
-    database.create_entry_table()
-    database.create_song_table()
-    database.create_done_song_table()
-    database.create_list_view()
-    database.create_done_song_view()
-    database.create_config_table()
-    helpers.setup_config(app)
+    with app.app_context():    
+        helpers.load_dbconfig(app)
+        helpers.load_version(app)
+        database.create_entry_table()
+        database.create_song_table()
+        database.create_done_song_table()
+        database.create_list_view()
+        database.create_done_song_view()
+        database.create_config_table()
+        helpers.setup_config(app)
 
 
 @app.after_request
@@ -300,6 +300,8 @@ def add_header(response):
 def inject_version():
     return dict(karaoqueue_version=app.config['VERSION'])
 
+# Perform setup here so it will be executed when the module is imported by the WSGI server.
+activate_job()
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8080, debug=True)
