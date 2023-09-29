@@ -28,6 +28,11 @@
         ]
       }
     },
-    "forwardPorts": [5000]
+	"forwardPorts": [
+		5000
+	],
+	"features": {
+		"ghcr.io/devcontainers-contrib/features/angular-cli:2": {}
+	}
   }
   
