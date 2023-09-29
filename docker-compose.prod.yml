@@ -1,0 +1,23 @@
+version: "3.9"
+
+secrets:
+  secrets:
+    file: ./secrets.yml
+
+services:
+  karaoqueue:
+    image: "ghcr.io/phoenixtwofive/karaoqueue:v2023.06"
+    build: .
+    restart: always
+    ports:
+      - "127.0.0.1:8081:80" # Please put a reverse proxy in front of this
+    env_file: .env
+  db:
+    image: mariadb
+    restart: always
+    env_file: .env 
+    volumes:
+    - karaoqueue-db:/var/lib/mysql
+
+volumes:
+  karaoqueue-db:

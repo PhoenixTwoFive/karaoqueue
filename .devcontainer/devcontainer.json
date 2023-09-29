@@ -1,0 +1,33 @@
+{
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "hostRequirements": {
+      "cpus": 4
+    },
+    "waitFor": "onCreateCommand",
+    "onCreateCommand": "curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash && sudo apt install -y libmariadb3 libmariadb-dev",
+    "updateContentCommand": "pip install -r backend/requirements.txt",
+    "postCreateCommand": "",
+    "postAttachCommand": {
+      "server": "flask --debug run"
+    },
+    "portsAttributes": {
+      "5000": {
+        "label": "Application",
+        "onAutoForward": "openPreview"
+      }
+    },
+    "customizations": {
+      "codespaces": {
+        "openFiles": [
+          "templates/index.html"
+        ]
+      },
+      "vscode": {
+        "extensions": [
+          "ms-python.python"
+        ]
+      }
+    },
+    "forwardPorts": [5000]
+  }
+  

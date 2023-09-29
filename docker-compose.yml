@@ -1,0 +1,15 @@
+# This Compose file is for development only. It is not intended for production use.
+# It only starts auxiliary services, such as a database, that are required for the
+# application to run. The application itself is started separately, using the
+# command "python -m flask run" or your favorite IDE.
+# Useful for attaching a debugger to the application.
+
+version: "3.9"
+
+services:
+  db:
+    image: mariadb
+    restart: always
+    env_file: .env.dev
+    ports:
+      - "3306:3306"

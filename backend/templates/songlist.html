@@ -46,7 +46,7 @@
                     var items = [];
                     $.each(data, function (key, val) {
                         items.push("<tr><td>" + val[0] + `</td>
-                            <td><button type='button'
+                            <td class='buttoncell'><button type='button'
                                     class='btn btn-primary justify-content-center align-content-between enqueueButton'
                                     data-toggle='modal'
                                     data-target='#enqueueModal' onclick='setSelectedId(`+ val[1] + `)'><i
@@ -67,6 +67,9 @@
             e.preventDefault();
             submitModal();
         });
+        $('#enqueueModal').on('shown.bs.modal', function (e) {
+            $("#singerNameInput").focus();
+        })
     });
 
 
@@ -79,7 +82,7 @@
         $.ajax({
             type: 'POST',
             url: '/api/enqueue',
-            data: JSON.stringify(data), // or JSON.stringify ({name: 'jonas'}),
+            data: JSON.stringify(data),
             success: success_callback,
             statusCode: {
                 423: blocked_callback
@@ -96,7 +99,18 @@
     function submitModal() {
         var name = $("#singerNameInput").val();
         var id = $("#selectedId").attr("value");
-        enqueue(localStorage.getItem("clientId"),id, name, function () {
+        enqueue(localStorage.getItem("clientId"),id, name, function (response) {
+            console.log(response);
+            entryID = response["entry_id"];
+            toast = {
+                title: "Erfolgreich eingetragen",
+                message: "Du wurdest erfolgreich eingetragen.",
+                status: TOAST_STATUS.SUCCESS,
+                timeout: 5000
+            }
+            Toast.create(toast);
+            console.log("Entry ID: " + entryID);
+            addEntry(entryID);
             $("#enqueueModal").modal('hide');
             window.location.href = '/#end';
         }, function (response) {
@@ -118,7 +132,7 @@
                 $(".enqueueButton").prop("disabled", true)
                 $(".enqueueButton").prop("style", "pointer-events: none;")
                 $(".enqueueButton").wrap("<span class='tooltip-span' tabindex='0' data-toggle='tooltip' data-placement='top'></span>");
-                $(".tooltip-span").prop("title", "Eintragungen sind leider nicht mehr möglich.")
+                $(".tooltip-span").prop("title", "Eintragungen sind leider momentan nicht möglich.")
                 $('[data-toggle="tooltip"]').tooltip()
             } else {
                 $(".enqueueButton").prop("disabled", false)

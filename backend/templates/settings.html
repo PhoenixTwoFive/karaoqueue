@@ -10,9 +10,32 @@
         <label for="maxqueue">Maximale Anzahl an Einträgen Insgesamt</label>
         <input type="number" class="form-control" id="maxqueue" name="maxqueue" min=1 value={{app.config['MAX_QUEUE']}}>
     </p>
+    <p>
+        <label for="theme">Aktives Theme</label>
+        <select class="form-control" id="theme" name="theme">
+            {% for theme in themes %}
+            <option value="{{theme}}" {% if theme == config['THEME'] %}selected{% endif %}>{{theme}}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <div class="alert alert-warning" role="alert">
+        <i class="fas fa-exclamation-triangle mr-1"></i>
+        <strong>Warnung:</strong> Änderungen an den folgenden Einstellungen führen zu einer sofortigen Abmeldung!
+    </div>
+    <p>
+        <label for="username">Benutzername</label>
+        <input type="text" class="form-control" id="username" name="username" value={{app.config['BASIC_AUTH_USERNAME']}}>
+    </p>
+    <p>
+        <label for="password">Passwort ändern</label>
+        <input type="password" class="form-control" id="password" name="password">
+    </p>
     <input type="submit" class="btn btn-primary mr-1 mb-2" value="Einstellungen anwenden">
-    <input type="button" class="btn btn-default mr-1 mb-2" onclick="$.get('/writeSettings').done(()=>{alert('Einstellungen gespeichert')}).fail(()=>{alert('Fehler beim Speichern der Einstellungen')})" value="Einstellungen speichern"/>
 </form>
+<details>
+    <summary>Current config:</summary>
+    <pre>{% for key, val in config.items() %}{{key}}: {{val}}<br>{% endfor %}</pre>
+</details>
 {% endblock %}
 {% block extrajs %}
 {% endblock %}

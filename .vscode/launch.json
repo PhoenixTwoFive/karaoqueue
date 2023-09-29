@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
@@ -14,8 +14,9 @@
             "env": {
                 "FLASK_APP": "backend/app.py",
                 "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1"
+                "FLASK_DEBUG": "1", 
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger",
@@ -24,7 +25,7 @@
             "jinja": true
         },
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask (with reload)",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
@@ -35,6 +36,7 @@
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger"
@@ -42,7 +44,7 @@
             "jinja": true
         },
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask (with reload, externally reachable)",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
@@ -53,6 +55,7 @@
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger",
@@ -61,7 +64,7 @@
             "jinja": true
         },
         {
-            "preLaunchTask": "versiondump",
+            "preLaunchTask": "mariadb",
             "name": "Python: Flask (externally reachable)",
             "type": "python",
             "cwd": "${workspaceFolder}/backend",
@@ -72,6 +75,7 @@
                 "FLASK_ENV": "development",
                 "FLASK_DEBUG": "1"
             },
+            "envFile": "${workspaceFolder}/.env.dev",
             "args": [
                 "run",
                 "--no-debugger",

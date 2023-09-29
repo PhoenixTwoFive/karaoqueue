@@ -1,4 +1,5 @@
-from flask import Flask, render_template, Response, abort, request, redirect, send_from_directory
+from flask import Flask, render_template, abort, request, redirect, send_from_directory, jsonify
+from flask.wrappers import Response
 import helpers
 import database
 import data_adapters
@@ -9,7 +10,8 @@ from helpers import nocache
 app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
-accept_entries = False
+accept_entries = True
+
 
 @app.route("/")
 def home():
@@ -35,13 +37,13 @@ def enqueue():
     if not helpers.is_valid_uuid(client_id):
         print(request.data)
         abort(400)
-    name = request.json['name']
+    name = request.json['name'].strip()
     song_id = request.json['id']
     if request.authorization:
-        database.add_entry(name, song_id, client_id)
-        return Response('{"status":"OK"}', mimetype='text/json')
+        entry_id = database.add_entry(name, song_id, client_id)
+        return Response(f"""{{"status":"OK", "entry_id":{entry_id}}}""", mimetype='text/json')
     else:
-        if accept_entries:
+        if helpers.get_accept_entries(app):
             if not request.json:
                 print(request.data)
                 abort(400)
@@ -51,10 +53,10 @@ def enqueue():
                 abort(400)
             name = request.json['name']
             song_id = request.json['id']
-            if database.check_queue_length() < app.config['MAX_QUEUE']:
-                if database.check_entry_quota(client_id) < app.config['ENTRY_QUOTA']:
-                    database.add_entry(name, song_id, client_id)
-                    return Response('{"status":"OK"}', mimetype='text/json')
+            if database.check_queue_length() < int(app.config['MAX_QUEUE']):
+                if database.check_entry_quota(client_id) < int(app.config['ENTRY_QUOTA']):
+                    entry_id = database.add_entry(name, song_id, client_id)
+                    return Response(f"""{{"status":"OK", "entry_id":{entry_id}}}""", mimetype='text/json')
                 else:
                     return Response('{"status":"Du hast bereits ' + str(database.check_entry_quota(client_id)) + ' Songs eingetragen, dies ist das Maximum an Einträgen die du in der Warteliste haben kannst."}', mimetype='text/json', status=423)
             else:
@@ -72,7 +74,7 @@ def songlist():
 @nocache
 @basic_auth.required
 def settings():
-    return render_template('settings.html', app=app, auth=basic_auth.authenticate())
+    return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes())
 
 
 @app.route("/settings", methods=['POST'])
@@ -81,16 +83,33 @@ def settings():
 def settings_post():
     entryquota = request.form.get("entryquota")
     maxqueue = request.form.get("maxqueue")
-    if entryquota.isnumeric() and int(entryquota) > 0:
-        app.config['ENTRY_QUOTA'] = int(entryquota)
+    theme = request.form.get("theme")
+    username = request.form.get("username")
+    password = request.form.get("password")
+    changed_credentials = False
+    if entryquota.isnumeric() and int(entryquota) > 0:  # type: ignore
+        app.config['ENTRY_QUOTA'] = int(entryquota)  # type: ignore
     else:
         abort(400)
-    if maxqueue.isnumeric and int(maxqueue) > 0:
-        app.config['MAX_QUEUE'] = int(maxqueue)
+    if maxqueue.isnumeric and int(maxqueue) > 0:  # type: ignore
+        app.config['MAX_QUEUE'] = int(maxqueue)  # type: ignore
     else:
         abort(400)
-
-    return render_template('settings.html', app=app, auth=basic_auth.authenticate())
+    if theme is not None and theme in helpers.get_themes():
+        helpers.set_theme(app, theme)
+    else:
+        abort(400)
+    if username != "" and username != app.config['BASIC_AUTH_USERNAME']:
+        app.config['BASIC_AUTH_USERNAME'] = username
+        changed_credentials = True
+    if password != "":
+        app.config['BASIC_AUTH_PASSWORD'] = password
+        changed_credentials = True
+    helpers.persist_config(app=app)
+    if changed_credentials:
+        return redirect("/")
+    else:
+        return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes())
 
 
 @app.route("/api/queue")
@@ -119,29 +138,48 @@ def songs():
 @basic_auth.required
 def update_songs():
     database.delete_all_entries()
+    helpers.reset_current_event_id(app)
     status = database.import_songs(
         helpers.get_songs(helpers.get_catalog_url()))
     print(status)
     return Response('{"status": "%s" }' % status, mimetype='text/json')
 
 
-@app.route("/api/songs/compl")
+@app.route("/api/songs/compl")  # type: ignore
 @nocache
 def get_song_completions(input_string=""):
     input_string = request.args.get('search', input_string)
     if input_string != "":
-        print(input_string)
-        list = database.get_song_completions(input_string=input_string)
-        return Response(json.dumps(list, ensure_ascii=False).encode('utf-8'), mimetype='text/json')
+        result = [list(x) for x in database.get_song_completions(input_string=input_string)]
+        return jsonify(result)
 
     else:
         return 400
 
 
-@app.route("/api/entries/delete/<entry_id>")
+@app.route("/api/entries/delete/<entry_id>", methods=['GET'])
 @nocache
 @basic_auth.required
-def delete_entry(entry_id):
+def delete_entry_admin(entry_id):
+    if database.delete_entry(entry_id):
+        return Response('{"status": "OK"}', mimetype='text/json')
+    else:
+        return Response('{"status": "FAIL"}', mimetype='text/json')
+
+
+@app.route("/api/entries/delete/<entry_id>", methods=['POST'])
+@nocache
+def delete_entry_user(entry_id):
+    if not request.json:
+        print(request.data)
+        abort(400)
+    client_id = request.json['client_id']
+    if not helpers.is_valid_uuid(client_id):
+        print(request.data)
+        abort(400)
+    if database.get_raw_entry(entry_id)[3] != client_id:  # type: ignore
+        print(request.data)
+        abort(403)
     if database.delete_entry(entry_id):
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
@@ -158,7 +196,7 @@ def delete_entries():
         return
     updates = database.delete_entries(request.json)
     if updates >= 0:
-        return Response('{"status": "OK", "updates": '+str(updates)+'}', mimetype='text/json')
+        return Response('{"status": "OK", "updates": ' + str(updates) + '}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
 
@@ -171,6 +209,7 @@ def mark_sung(entry_id):
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
+
 
 @app.route("/api/entries/mark_transferred/<entry_id>")
 @nocache
@@ -186,9 +225,8 @@ def mark_transferred(entry_id):
 @nocache
 @basic_auth.required
 def set_accept_entries(value):
-    global accept_entries
     if (value == '0' or value == '1'):
-        accept_entries = bool(int(value))
+        helpers.set_accept_entries(app, bool(int(value)))
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
@@ -197,8 +235,8 @@ def set_accept_entries(value):
 @app.route("/api/entries/accept")
 @nocache
 def get_accept_entries():
-    global accept_entries
-    return Response('{"status": "OK", "value": '+str(int(accept_entries))+'}', mimetype='text/json')
+    accept_entries = helpers.get_accept_entries(app)
+    return Response('{"status": "OK", "value": ' + str(int(accept_entries)) + '}', mimetype='text/json')
 
 
 @app.route("/api/played/clear")
@@ -216,6 +254,7 @@ def clear_played_songs():
 @basic_auth.required
 def delete_all_entries():
     if database.delete_all_entries():
+        helpers.reset_current_event_id(app)
         return Response('{"status": "OK"}', mimetype='text/json')
     else:
         return Response('{"status": "FAIL"}', mimetype='text/json')
@@ -227,17 +266,23 @@ def admin():
     return redirect("/", code=303)
 
 
+@app.route("/api/events/current")
+@nocache
+def get_current_event():
+    return Response('{"status": "OK", "event": "' + helpers.get_current_event_id(app) + '"}', mimetype='text/json')
+
+
 @app.before_first_request
 def activate_job():
+    helpers.load_dbconfig(app)
     helpers.load_version(app)
-    helpers.create_data_directory()
     database.create_entry_table()
     database.create_song_table()
     database.create_done_song_table()
     database.create_list_view()
     database.create_done_song_view()
+    database.create_config_table()
     helpers.setup_config(app)
-
 
 
 @app.after_request
@@ -246,9 +291,10 @@ def add_header(response):
     Add headers to both force latest IE rendering engine or Chrome Frame,
     and also to cache the rendered page for 10 minutes.
     """
-    if not 'Cache-Control' in response.headers:
-        response.headers['Cache-Control'] = 'private, max-age=600'
+    if 'Cache-Control' not in response.headers:
+        response.headers['Cache-Control'] = 'private, max-age=600, no-cache, must-revalidate'
     return response
+
 
 @app.context_processor
 def inject_version():

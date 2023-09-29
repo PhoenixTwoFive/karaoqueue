@@ -6,27 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="favicon.ico">
     <link rel="manifest" href="/static/manifest.webmanifest">
 
     <title>{% block title %}{% endblock %} - KaraoQueue</title>
 
     <!-- Bootstrap-Tables -->
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.css">
+
+    <!-- Bootstrap-Toaster-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.1.2/css/bootstrap-toaster.min.css"
+        integrity="sha512-kYPLvO+Bu+xttOhbQvxs9nx7XSdxrb2JexRxQ3CpJQ7EtmlkBsWyOjlinLgiLWeLxuupFYB4cPqLOo0gnBnzeQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
     <!-- Custom styles for this template -->
     <link href="static/css/style.css" rel="stylesheet">
 
     <!-- Fontawesome Icons -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
-        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Bootstraptoggle -->
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
+    <!-- Active Theme -->
+    <link href="static/css/themes/{{config['THEME']}}" rel="stylesheet">
 
 </head>
 
@@ -73,9 +81,9 @@
             {% if not auth %}
             <a href="/login" class="ml-1 mr-1"><i class="fas fa-sign-in-alt mr-1"></i><span>Login</span></a>
             {% endif %}
-            <!--<a href="https://github.com/PhoenixTwoFive/karaoqueue"
-                class="ml-1 mr-1"><i class="fab fa-github mr-1"></i><span>Github</span></a>-->
-            <span class="text-muted">KaraoQueue {{karaoqueue_version}} -&nbsp;<span>&copy</span>&nbsp;2019-21 - Phillip
+            <a href="https://github.com/PhoenixTwoFive/karaoqueue"
+                class="ml-1 mr-1"><i class="fab fa-github mr-1"></i><span>Github</span></a>
+            <span class="text-muted"> {{karaoqueue_version}} -&nbsp;2019-23 - Phillip
                 Kühne</span>
         </div>
     </footer>
@@ -83,27 +91,26 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-        integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" crossorigin="anonymous">
-        </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"
+        integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous">
-        </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous">
-        </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"
         integrity="sha256-4F7e4JsAJyLUdpP7Q8Sah866jCOhv72zU5E8lIRER4w=" crossorigin="anonymous">
         </script>
-    <script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.js"></script>
     <script
-        src="https://unpkg.com/bootstrap-table@1.15.3/dist/extensions/auto-refresh/bootstrap-table-auto-refresh.min.js"></script>
+        src="https://unpkg.com/bootstrap-table@1.21.2/dist/extensions/auto-refresh/bootstrap-table-auto-refresh.min.js"></script>
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-toaster/4.1.2/js/bootstrap-toaster.min.js"
+        integrity="sha512-Ur6jgeoP3jnn38C7oBzDqMLRb+wxG2PXLKqgx2vgQ1ePFvbJ28f9iQSJplHD0APFHELOeS/df+RPNeENFtLrYw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     {% block extrajs %}{% endblock %}
     <script>
         $(document).ready(function () {
-            loadOrGenerateClientId()
+            checkEventID()
             // get current URL path and assign 'active' class
             var pathname = window.location.pathname;
             $('.navbar-nav > li > a[href="' + pathname + '"]').parent().addClass('active');
@@ -122,9 +129,53 @@
 
         function loadOrGenerateClientId() {
             if (!localStorage.getItem("clientId")) {
-                localStorage.setItem("clientId",create_UUID())
+                localStorage.setItem("clientId", create_UUID())
             }
         }
+
+        function getClientId() {
+            return localStorage.getItem("clientId")
+        }
+
+        async function checkEventID() {
+            const localEventID = localStorage.getItem("eventID")
+            const resp = await fetch("/api/events/current")
+            const respJson = await resp.json()
+            const remoteEventID = respJson.event
+
+            if (localEventID == null || localEventID != remoteEventID) {
+                localStorage.clear()
+                localStorage.setItem("eventID", remoteEventID)
+                loadOrGenerateClientId()
+            }
+        }
+
+        function addEntry(entryId) {
+          entryArray = JSON.parse(localStorage.getItem("ownedEntries"))
+          if (entryArray == null) {
+            entryArray = []
+          }
+          entryArray.push(entryId)
+          localStorage.setItem("ownedEntries", JSON.stringify(entryArray))
+        }
+
+        function removeEntry(entryId) {
+          entryArray = JSON.parse(localStorage.getItem("ownedEntries"))
+          if (entryArray == null) {
+            entryArray = []
+          }
+          entryArray = entryArray.filter(function(value, index, arr){ return value != entryId;});
+          localStorage.setItem("ownedEntries", JSON.stringify(entryArray))
+        }
+
+        function getOwnedEntries() {
+          var entries = JSON.parse(localStorage.getItem("ownedEntries"))
+          if (entries == null) {
+            entries = []
+          }
+          return entries;
+        }
+
     </script>
 </body>
 
