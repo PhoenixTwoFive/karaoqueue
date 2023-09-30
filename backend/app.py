@@ -7,7 +7,10 @@ import os
 import json
 from flask_basicauth import BasicAuth
 from helpers import nocache
+from flask_cors import CORS
+
 app = Flask(__name__, static_url_path='/static')
+CORS(app)
 
 basic_auth = BasicAuth(app)
 accept_entries = True
