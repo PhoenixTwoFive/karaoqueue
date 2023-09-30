@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RuntimeConfigLoaderService } from 'runtime-config-loader';
  
 
 @Component({
