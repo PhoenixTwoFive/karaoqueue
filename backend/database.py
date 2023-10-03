@@ -62,7 +62,9 @@ def create_song_table():
         `Explicit` INTEGER,
         `Date Added` TIMESTAMP,
         `Styles` TEXT,
-        `Languages` TEXT
+        `Languages` TEXT,
+        PRIMARY KEY (`Id`),
+        FULLTEXT KEY (`Title`,`Artist`)
         )""")
         conn.execute(stmt)
         conn.commit()
@@ -123,13 +125,46 @@ def get_song_list():
 
 def get_song_completions(input_string):
     with get_db_engine().connect() as conn:
-        prepared_string = f"%{input_string.upper()}%"
+        prepared_string = f"{input_string}"
+        prepared_string_with_wildcard = f"%{input_string}%"
         stmt = text(
-            "SELECT CONCAT(Artist, ' - ', Title) AS Song, Id FROM songs WHERE CONCAT(Artist, ' - ', Title) LIKE :prepared_string LIMIT 20;")
+            """
+            SELECT CONCAT(Artist, ' - ', Title) AS Song, Id FROM songs
+            WHERE MATCH(Artist, Title) 
+            AGAINST (:prepared_string IN NATURAL LANGUAGE MODE)
+            LIMIT 20;
+            """)
         cur = conn.execute(
-            stmt, {"prepared_string": prepared_string})  # type: ignore
+            stmt, {"prepared_string": prepared_string, "prepared_string_with_wildcard": prepared_string_with_wildcard})  # type: ignore
         return cur.fetchall()
 
+
+def get_songs_with_details(input_string: str):
+    with get_db_engine().connect() as conn:
+        prepared_string = f"%{input_string}"
+        stmt = text(
+            """
+            SELECT Id, Title, Artist, Year, Duo, Explicit, Styles, Languages FROM songs 
+            WHERE MATCH(Artist, Title)
+            AGAINST (:prepared_string IN NATURAL LANGUAGE MODE)
+            LIMIT 20;
+            """
+        )
+        cur = conn.execute(
+            stmt, {"prepared_string": prepared_string})
+        return cur.fetchall()
+
+def get_song_details(song_id: int):
+    with get_db_engine().connect() as conn:
+        stmt = text(
+            """
+            SELECT Id, Title, Artist, Year, Duo, Explicit, Styles, Languages FROM songs 
+            WHERE Id = :song_id;
+            """
+        )
+        cur = conn.execute(
+            stmt, {"song_id": song_id})
+        return cur.fetchall()
 
 def add_entry(name, song_id, client_id):
     with get_db_engine().connect() as conn:

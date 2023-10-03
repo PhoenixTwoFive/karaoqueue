@@ -155,7 +155,27 @@ def get_song_completions(input_string=""):
 
     else:
         return 400
+    
+    
+@app.route("/api/songs/search")
+@nocache
+def query_songs_with_details(input_string=""):
+    input_string = request.args.get("q", input_string)
+    if input_string == "":
+        return Response(status=400)
+    result = []
+    for x in database.get_songs_with_details(input_string):
+        # Turn row into dict. Add field labels.
+        result.append(dict(zip(['karafun_id', 'title', 'artist', 'year', 'duo', 'explicit', 'styles', 'languages'], x)))
+    return jsonify(result)
 
+@app.route("/api/songs/details/<song_id>")
+def get_song_details(song_id):
+    result = database.get_song_details(song_id)
+    if result is None:
+        abort(404)
+    else:
+        return jsonify(dict(zip(['karafun_id', 'title', 'artist', 'year', 'duo', 'explicit', 'styles', 'languages'], result[0])))
 
 @app.route("/api/entries/delete/<entry_id>", methods=['GET'])
 @nocache
