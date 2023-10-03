@@ -4,23 +4,23 @@ import { Artist } from './artist.model';
 
 export class Song {
 
-  constructor(title: string, artist: Artist, karafun_id: number, duet: boolean, explicit: boolean, id: number, genres: Array<String>, languages: Array<String>) {
+  constructor(title: string, artist: Artist, karafun_id: number, duo: boolean, explicit: boolean, id: number, styles: Array<String>, languages: Array<String>) {
     this.title=title;
     this.artist=artist;
     this.karafun_id=karafun_id;
-    this.duet=duet;
+    this.duo=duo;
     this.explicit=explicit;
     this.id=id;
-    this.genres=genres;
+    this.styles=styles;
     this.languages=languages;
   }
 
   title: string;
   artist: Artist;
   karafun_id: number;
-  duet: boolean;
+  duo: boolean;
   explicit: boolean;
   id: number;
-  genres: Array<String>;
+  styles: Array<String>;
   languages: Array<String>;
 }

@@ -25,11 +25,19 @@ export class SongServiceService {
 
     let out = new Array<Song>();
 
-    this.http.get(this.api +"/songs/compl?search="+text).subscribe((data: Observable<JSON>) => {
+    this.http.get(this.api +"/songs/search?q="+text).subscribe((data: Observable<JSON>) => {
       data.forEach(element => {
-        console.log(element);
-        out.push(new Song(element["title"],element["artist"],element["karafun_id"],element["duo"],element["explicit"],element["_id"],element["styles"],element["languages"]));
+        let styles = new Array<String>();
+        let languages = new Array<String>();
+        for (let style of element["styles"].split(",")) {
+          styles.push(style);
+        }
+        for (let language of element["languages"].split(",")) {
+          languages.push(language);
+        }
+        out.push(new Song(element["title"],element["artist"],element["karafun_id"],element["duo"],element["explicit"],element["_id"],styles,languages));
       });
+      console.log(out);
     });
 
     const observable = new Observable<Array<Song>>( subscriber => {

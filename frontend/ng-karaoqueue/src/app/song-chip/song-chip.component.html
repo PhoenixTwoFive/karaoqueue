@@ -1,0 +1,36 @@
+<mat-card class="result">
+    <div class="card-left">
+        <mat-card-title>{{song.artist}} - {{song.title}}</mat-card-title>
+        <div class="song-info">
+            <div class="info-icons">
+                <ng-template [ngIf]="song.duo==1" [ngIfElse]="nonduet">
+                    <mat-icon svgIcon="account-multiple"></mat-icon>
+                </ng-template>
+                <ng-template #nonduet>
+                    <mat-icon svgIcon="account"></mat-icon>
+                </ng-template>
+                <ng-template [ngIf]="song.explicit==1" [ngIfElse]="nonexplicit">
+                    <mat-icon svgIcon="alpha-e-box"></mat-icon>
+                </ng-template>
+                <ng-template #nonexplicit>
+                    <mat-icon svgIcon="alpha-e-box" class="icon-disabled"></mat-icon>
+                </ng-template>
+            </div>
+            <div class="genre-list">
+                <mat-icon svgIcon="music-circle"></mat-icon>
+                <mat-chip-list *ngFor="let style of song.styles">
+                    <mat-chip>{{style}}</mat-chip>
+                </mat-chip-list>
+            </div>
+            <div class="language-list">
+                <mat-icon svgIcon="account-voice"></mat-icon>
+                <mat-chip-list *ngFor="let language of song.languages">
+                    <mat-chip>{{language}}</mat-chip>
+                </mat-chip-list>
+            </div>
+        </div>
+    </div>
+    <button mat-flat-button color="accent" class="add-button">
+        <mat-icon svgIcon="playlist-plus"></mat-icon>
+    </button>
+</mat-card>

@@ -46,12 +46,14 @@ import { EntryListingComponent } from './entry-listing/entry-listing.component';
 import { SongSearchComponent } from './song-search/song-search.component';
 
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
+import { SongChipComponent } from './song-chip/song-chip.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     EntryListingComponent,
-    SongSearchComponent
+    SongSearchComponent,
+    SongChipComponent
   ],
   imports: [
     BrowserModule,
