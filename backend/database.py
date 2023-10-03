@@ -285,7 +285,6 @@ def get_config(key: str) -> str:
 
 
 def set_config(key: str, value: str) -> bool:
-    print(f"Setting config {key} to {value}")
     with get_db_engine().connect() as conn:
         conn.execute(text(
             "INSERT INTO config (`Key`, `Value`) VALUES ( :par_key , :par_value) ON DUPLICATE KEY UPDATE `Value`= :par_value"),
