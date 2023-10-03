@@ -23,32 +23,46 @@
                         <p id="songArtist"></p>
                     </div>
                 </div>
-                <div class="row" id="indicators">
-                    <div class="col">
+                <div class="row">
+                    <div class="col-1">
+                        <p><i class="fas fa-info"></i></p>
+                    </div>
+                    <div class="col" id="indicators">
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-4">
-                        <p></p>
+                    <div class="col-1">
+                        <p><i class="fas fa-file-audio"></i></p>
+                    </div>
+                    <div class="col">
+                        <p id="songGenres"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1">
+                        <p><i class="fas fa-language"></i></p>
+                    </div>
+                    <div class="col">
+                        <p id="songLanguages"></p>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="form-group">
-            <form id="nameForm">
-                <div class="modal-body">
-                    <label for="singerNameInput">Sängername</label>
-                    <input type="text" class="form-control" id="singerNameInput" placeholder="Max Mustermann" required>
-                    <input id="selectedId" name="selectedId" type="hidden" value="">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="submitSongButton">Anmelden</button>
-                </div>
-            </form>
+            <div class="form-group">
+                <form id="nameForm">
+                    <div class="modal-body">
+                        <label for="singerNameInput">Sängername</label>
+                        <input type="text" class="form-control" id="singerNameInput" placeholder="Max Mustermann"
+                            required>
+                        <input id="selectedId" name="selectedId" type="hidden" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+                        <button type="submit" class="btn btn-primary" id="submitSongButton">Anmelden</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 </div>
 {% endblock %}
 {% block extrajs %}
@@ -59,19 +73,56 @@
             var value = $(this).val().toLowerCase();
             //alert(value);
             if (value.length >= 1) {
-                $.getJSON("/api/songs/compl", { search: value }, function (data) {
+                $.getJSON("/api/songs/search", { q: value }, function (data) {
                     var items = [];
+                    $("#songtable").html("")
                     $.each(data, function (key, val) {
-                        items.push("<tr><td>" + val[0] + `</td>
-                            <td class='buttoncell'><button type='button'
-                                    class='btn btn-primary justify-content-center align-content-between enqueueButton'
-                                    data-toggle='modal'
-                                    data-target='#enqueueModal' onclick='setSelectedId(`+ val[1] + `)'><i
-                                        class="fas fa-plus"></i></button></td>
-                        </tr>`)
+                        let itemRow = document.createElement("tr")
+                        let itemCell = document.createElement("td")
+                        itemCell.innerHTML = val["artist"] + ` - ` + val["title"]
+                        itemRow.appendChild(itemCell)
+                        let infoCell = document.createElement("td")
+                        let duoindicator = document.createElement("i")
+                        duoindicator.classList.add("fas")
+                        if (val["duo"] == 0) {
+                            duoindicator.classList.add("fa-user")
+                            
+                        }
+                        if (val["duo"] == 1) {
+                            duoindicator.classList.add("fa-user-friends")
+                        }
+                        duoindicator.classList.add("ml-1")
+                        duoindicator.classList.add("list-indicator")
+                        infoCell.appendChild(duoindicator)
+                        if (val["explicit"] == 1) {
+                            let explicitindicator = document.createElement("i")
+                            explicitindicator.classList.add("fas")
+                            explicitindicator.classList.add("fa-e")
+                            explicitindicator.classList.add("ml-1")
+                            infoCell.appendChild(explicitindicator)
+                        }
+                        itemRow.appendChild(infoCell)
+                        let buttonCell = document.createElement("td")
+                        let button = document.createElement("button")
+                        button.classList.add("btn")
+                        button.classList.add("btn-primary")
+                        button.classList.add("justify-content-center")
+                        button.classList.add("align-content-between")
+                        button.classList.add("enqueueButton")
+                        button.setAttribute("type", "button")
+                        button.setAttribute("data-toggle", "modal")
+                        button.setAttribute("data-target", "#enqueueModal")
+                        button.setAttribute("onclick", "setSelectedId(" + val["karafun_id"] + ")")
+                        let buttonIcon = document.createElement("i")
+                        buttonIcon.classList.add("fas")
+                        buttonIcon.classList.add("fa-plus")
+                        button.appendChild(buttonIcon)
+                        buttonCell.appendChild(button)
+                        itemRow.appendChild(buttonCell)
+                        $("#songtable").append(itemRow)
                     });
 
-                    $("#songtable").html("")
+                    
                     $(items.join("")).appendTo("#songtable");
                     entriesAccepted()
                 });
@@ -115,17 +166,78 @@
             console.log(data);
             $("#songTitle").html(data["title"]);
             $("#songArtist").html(data["artist"]);
-            if(data["duo"] == 1){
+
+            $("#indicators")[0].innerHTML = "";
+
+            let duoindicator_badge = document.createElement("span");
+            duoindicator_badge.classList.add("badge");
+            duoindicator_badge.classList.add("badge-secondary");
+            duoindicator_badge.classList.add("badge-pill");
+            duoindicator_badge.classList.add("mx-1");
+            duoindicator_badge.classList.add("p-2");
+
+            if (data["duo"] == 0) {
+                duoindicator_badge.innerHTML = "Solo";
+                let duoindicator = document.createElement("i");
+                duoindicator.classList.add("fas");
+                duoindicator.classList.add("fa-user");
+                duoindicator.classList.add("ml-1");
+                duoindicator_badge.appendChild(duoindicator);
+                $("#indicators")[0].appendChild(duoindicator_badge)
+            }
+
+            if (data["duo"] == 1) {
+                duoindicator_badge.innerHTML = "Duo";
                 let duoindicator = document.createElement("i");
                 duoindicator.classList.add("fas");
                 duoindicator.classList.add("fa-user-friends");
-                $("#indicators")[0].children[0].appendChild(duoindicator)
+                duoindicator.classList.add("ml-1");
+                duoindicator_badge.appendChild(duoindicator);
+                $("#indicators")[0].appendChild(duoindicator_badge)
             }
-            if(data["explicit"] == 1){
+
+            if (data["explicit"] == 1) {
+                let explicitindicator_badge = document.createElement("span");
+                explicitindicator_badge.classList.add("badge");
+                explicitindicator_badge.classList.add("badge-secondary");
+                explicitindicator_badge.classList.add("badge-pill");
+                explicitindicator_badge.classList.add("mx-1");
+                explicitindicator_badge.classList.add("p-2");
+                explicitindicator_badge.innerHTML = "Explicit";
                 let explicitindicator = document.createElement("i");
                 explicitindicator.classList.add("fas");
                 explicitindicator.classList.add("fa-e");
-                $("#indicators")[0].children[0].appendChild(explicitindicator)
+                explicitindicator.classList.add("ml-1");
+                explicitindicator_badge.appendChild(explicitindicator);
+                $("#indicators")[0].appendChild(explicitindicator_badge)
+            }
+
+            let styles = data["styles"].split(",");
+            let languages = data["languages"].split(",");
+
+            $("#songGenres").html("");
+            $("#songLanguages").html("");
+
+            for (let i = 0; i < styles.length; i++) {
+                let badge = document.createElement("span");
+                badge.classList.add("badge");
+                badge.classList.add("badge-secondary");
+                badge.classList.add("badge-pill");
+                badge.classList.add("mx-1");
+                badge.classList.add("p-2");
+                badge.innerHTML = styles[i];
+                $("#songGenres")[0].appendChild(badge);
+            }
+
+            for (let i = 0; i < languages.length; i++) {
+                let badge = document.createElement("span");
+                badge.classList.add("badge");
+                badge.classList.add("badge-secondary");
+                badge.classList.add("badge-pill");
+                badge.classList.add("mx-1");
+                badge.classList.add("p-2");
+                badge.innerHTML = languages[i];
+                $("#songLanguages")[0].appendChild(badge);
             }
         });
     }
@@ -170,6 +282,7 @@
                 $('[data-toggle="tooltip"]').tooltip()
             } else {
                 $(".enqueueButton").prop("disabled", false)
+
             }
 
         })
