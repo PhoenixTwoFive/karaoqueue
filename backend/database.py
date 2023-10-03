@@ -130,7 +130,7 @@ def get_song_completions(input_string):
         stmt = text(
             """
             SELECT CONCAT(Artist, ' - ', Title) AS Song, Id FROM songs
-            WHERE MATCH(Artist, Title) 
+            WHERE MATCH(Artist, Title)
             AGAINST (:prepared_string IN NATURAL LANGUAGE MODE)
             LIMIT 20;
             """)
@@ -144,7 +144,7 @@ def get_songs_with_details(input_string: str):
         prepared_string = f"%{input_string}"
         stmt = text(
             """
-            SELECT Id, Title, Artist, Year, Duo, Explicit, Styles, Languages FROM songs 
+            SELECT Id, Title, Artist, Year, Duo, Explicit, Styles, Languages FROM songs
             WHERE MATCH(Artist, Title)
             AGAINST (:prepared_string IN NATURAL LANGUAGE MODE)
             LIMIT 20;
@@ -154,17 +154,19 @@ def get_songs_with_details(input_string: str):
             stmt, {"prepared_string": prepared_string})
         return cur.fetchall()
 
+
 def get_song_details(song_id: int):
     with get_db_engine().connect() as conn:
         stmt = text(
             """
-            SELECT Id, Title, Artist, Year, Duo, Explicit, Styles, Languages FROM songs 
+            SELECT Id, Title, Artist, Year, Duo, Explicit, Styles, Languages FROM songs
             WHERE Id = :song_id;
             """
         )
         cur = conn.execute(
             stmt, {"song_id": song_id})
         return cur.fetchall()
+
 
 def add_entry(name, song_id, client_id):
     with get_db_engine().connect() as conn:
