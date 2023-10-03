@@ -325,6 +325,3 @@ def inject_version():
 
 # Perform setup here so it will be executed when the module is imported by the WSGI server.
 activate_job()
-
-if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=8080, debug=True)
