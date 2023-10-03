@@ -16,9 +16,9 @@ accept_entries = True
 @app.route("/")
 def home():
     if basic_auth.authenticate():
-        return render_template('main_admin.html', list=database.get_list(), auth=basic_auth.authenticate())
+        return render_template('main_admin.html', list=database.get_list(), auth=basic_auth.authenticate(), debug=app.config['DEBUG'])
     else:
-        return render_template('main.html', list=database.get_list(), auth=basic_auth.authenticate())
+        return render_template('main.html', list=database.get_list(), auth=basic_auth.authenticate(), debug=app.config['DEBUG'])
 
 
 @app.route("/favicon.ico")
@@ -67,14 +67,14 @@ def enqueue():
 
 @app.route("/list")
 def songlist():
-    return render_template('songlist.html', list=database.get_song_list(), auth=basic_auth.authenticate())
+    return render_template('songlist.html', list=database.get_song_list(), auth=basic_auth.authenticate(), debug=app.config['DEBUG'])
 
 
 @app.route("/settings")
 @nocache
 @basic_auth.required
 def settings():
-    return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes())
+    return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes(), debug=app.config['DEBUG'])
 
 
 @app.route("/settings", methods=['POST'])
@@ -109,7 +109,7 @@ def settings_post():
     if changed_credentials:
         return redirect("/")
     else:
-        return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes())
+        return render_template('settings.html', app=app, auth=basic_auth.authenticate(), themes=helpers.get_themes(), debug=app.config['DEBUG'])
 
 
 @app.route("/api/queue")
@@ -123,7 +123,7 @@ def queue_json():
 @nocache
 @basic_auth.required
 def played_list():
-    return render_template('played_list.html', list=database.get_played_list(), auth=basic_auth.authenticate())
+    return render_template('played_list.html', list=database.get_played_list(), auth=basic_auth.authenticate(), debug=app.config['DEBUG'])
 
 
 @app.route("/api/songs")

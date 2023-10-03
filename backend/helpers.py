@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import subprocess
 import os
 import uuid
 from flask import make_response, Flask
@@ -34,17 +35,14 @@ def check_config_exists():
 
 
 def load_version(app: Flask):
+    if app.config['DEBUG'] is True:
+        app.config['VERSION'] = subprocess.Popen("echo \"$(git rev-parse --abbrev-ref HEAD)-$(git describe)\"", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').strip() + " (debug)"  # noqa: E501 # type: ignore
+        return
     if os.environ.get("SOURCE_VERSION"):
         app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[0:7]  # type: ignore # noqa: E501
-    elif os.path.isfile(".version"):
-        with open('.version', 'r') as file:
-            data = file.read().replace('\n', '')
-            if data:
-                app.config['VERSION'] = data
-            else:
-                app.config['VERSION'] = ""
+        return
     else:
-        app.config['VERSION'] = ""
+        app.config['VERSION'] = "Unknown"
 
 
 def load_dbconfig(app: Flask):

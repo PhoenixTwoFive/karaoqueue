@@ -178,6 +178,16 @@ pre {
   height: 1.5rem;
 }
 
+.construction_bg {
+  background: repeating-linear-gradient(
+  45deg,
+  #222200,
+  #222200 10px,
+  #000000 10px,
+  #000000 20px
+);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     /* Navbar */
