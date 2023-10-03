@@ -173,6 +173,10 @@ pre {
   background-color: var(--copy-highlight-color);
 }
 
+.songinfo {
+  
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     /* Navbar */

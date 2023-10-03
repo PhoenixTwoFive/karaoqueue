@@ -16,22 +16,39 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="form-group">
-                <form id="nameForm">
-                    <div class="modal-body">
-                        <label for="singerNameInput">Sängername</label>
-                        <input type="text" class="form-control" id="singerNameInput" placeholder="Max Mustermann"
-                            required>
-                        <input id="selectedId" name="selectedId" type="hidden" value="">
+            <div class="songinfo container">
+                <div class="row">
+                    <div class="col">
+                        <h5 id="songTitle"></h5>
+                        <p id="songArtist"></p>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" id="submitSongButton">Anmelden</button>
+                </div>
+                <div class="row" id="indicators">
+                    <div class="col">
                     </div>
-                </form>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <p></p>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="form-group">
+            <form id="nameForm">
+                <div class="modal-body">
+                    <label for="singerNameInput">Sängername</label>
+                    <input type="text" class="form-control" id="singerNameInput" placeholder="Max Mustermann" required>
+                    <input id="selectedId" name="selectedId" type="hidden" value="">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="submitSongButton">Anmelden</button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 </div>
 {% endblock %}
 {% block extrajs %}
@@ -94,12 +111,29 @@
 
     function setSelectedId(id) {
         $("#selectedId").attr("value", id);
+        $.getJSON("/api/songs/details/" + id, function (data) {
+            console.log(data);
+            $("#songTitle").html(data["title"]);
+            $("#songArtist").html(data["artist"]);
+            if(data["duo"] == 1){
+                let duoindicator = document.createElement("i");
+                duoindicator.classList.add("fas");
+                duoindicator.classList.add("fa-user-friends");
+                $("#indicators")[0].children[0].appendChild(duoindicator)
+            }
+            if(data["explicit"] == 1){
+                let explicitindicator = document.createElement("i");
+                explicitindicator.classList.add("fas");
+                explicitindicator.classList.add("fa-e");
+                $("#indicators")[0].children[0].appendChild(explicitindicator)
+            }
+        });
     }
 
     function submitModal() {
         var name = $("#singerNameInput").val();
         var id = $("#selectedId").attr("value");
-        enqueue(localStorage.getItem("clientId"),id, name, function (response) {
+        enqueue(localStorage.getItem("clientId"), id, name, function (response) {
             console.log(response);
             entryID = response["entry_id"];
             toast = {
@@ -115,7 +149,7 @@
             window.location.href = '/#end';
         }, function (response) {
             bootbox.alert({
-                message: "Deine Eintragung konnte leider nicht vorgenommen werden.\nGrund: "+response.responseJSON.status,
+                message: "Deine Eintragung konnte leider nicht vorgenommen werden.\nGrund: " + response.responseJSON.status,
             });
             entriesAccepted();
             $("#enqueueModal").modal('hide');
