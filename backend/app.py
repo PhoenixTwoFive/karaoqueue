@@ -155,8 +155,8 @@ def get_song_completions(input_string=""):
 
     else:
         return 400
-    
-    
+
+
 @app.route("/api/songs/search")
 @nocache
 def query_songs_with_details(input_string=""):
@@ -169,6 +169,7 @@ def query_songs_with_details(input_string=""):
         result.append(dict(zip(['karafun_id', 'title', 'artist', 'year', 'duo', 'explicit', 'styles', 'languages'], x)))
     return jsonify(result)
 
+
 @app.route("/api/songs/details/<song_id>")
 def get_song_details(song_id):
     result = database.get_song_details(song_id)
@@ -176,6 +177,7 @@ def get_song_details(song_id):
         abort(404)
     else:
         return jsonify(dict(zip(['karafun_id', 'title', 'artist', 'year', 'duo', 'explicit', 'styles', 'languages'], result[0])))
+
 
 @app.route("/api/entries/delete/<entry_id>", methods=['GET'])
 @nocache
@@ -292,17 +294,17 @@ def get_current_event():
     return Response('{"status": "OK", "event": "' + helpers.get_current_event_id(app) + '"}', mimetype='text/json')
 
 
-@app.before_first_request
 def activate_job():
-    helpers.load_dbconfig(app)
-    helpers.load_version(app)
-    database.create_entry_table()
-    database.create_song_table()
-    database.create_done_song_table()
-    database.create_list_view()
-    database.create_done_song_view()
-    database.create_config_table()
-    helpers.setup_config(app)
+    with app.app_context():
+        helpers.load_dbconfig(app)
+        helpers.load_version(app)
+        database.create_entry_table()
+        database.create_song_table()
+        database.create_done_song_table()
+        database.create_list_view()
+        database.create_done_song_view()
+        database.create_config_table()
+        helpers.setup_config(app)
 
 
 @app.after_request
@@ -320,6 +322,9 @@ def add_header(response):
 def inject_version():
     return dict(karaoqueue_version=app.config['VERSION'])
 
+
+# Perform setup here so it will be executed when the module is imported by the WSGI server.
+activate_job()
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=8080, debug=True)
