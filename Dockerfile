@@ -17,4 +17,7 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 RUN pip install --no-cache-dir -U meinheld
 
+ARG SOURCE_VERSION
+ENV SOURCE_VERSION ${SOURCE_VERSION:-unknown}
+
 COPY ./backend /app
