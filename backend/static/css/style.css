@@ -129,13 +129,13 @@ body {
 .modal-header {
   background-color: var(--background-color);
   color: var(--text-color-var);
-  border-color: var(var(--modal-separator-color));
+  border-color: var(--modal-separator-color);
 }
 
 .modal-footer {
   background-color: var(--background-color);
   color: var(--text-color-var);
-  border-color: var(var(--modal-separator-color));
+  border-color: var(--modal-separator-color);
 }
 
 .form-control {
@@ -173,8 +173,9 @@ pre {
   background-color: var(--copy-highlight-color);
 }
 
-.songinfo {
-  
+.list-indicator {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
