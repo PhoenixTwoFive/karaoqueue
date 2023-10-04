@@ -15,12 +15,6 @@ if ! git diff-index --quiet HEAD --; then
     exit 1
 fi
 
-# Check if the user is logged into ghcr.io
-if ! docker info | grep -q "Username: $USERNAME"; then
-    echo "You are not logged into ghcr.io. Please run 'docker login ghcr.io' and try again."
-    exit 1
-fi
-
 # Get the appropriate version of the container using git
 VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git describe)
 
