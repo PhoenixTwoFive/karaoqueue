@@ -19,7 +19,7 @@ fi
 VERSION=$(git rev-parse --abbrev-ref HEAD)-$(git describe)
 
 # Build the container. Add the version as a tag and as ENV variable SOURCE_VERSION
-docker build -t ghcr.io/$USERNAME/:$VERSION --build-arg SOURCE_VERSION=$VERSION .
+docker build -t ghcr.io/$USERNAME/karaoqueue:$VERSION --build-arg SOURCE_VERSION=$VERSION .
 
 # Ask the user if they want to push the container. Confirm Version.
 read -p "Push container to ghcr.io/$USERNAME/karaoqueue:$VERSION? [y/n] " -n 1 -r
