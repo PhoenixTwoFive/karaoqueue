@@ -4,7 +4,7 @@
     "cpus": 4
   },
   "waitFor": "onCreateCommand",
-  "postCreateCommand": "curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash && sudo apt install -y libmariadb3 libmariadb-dev",
+  "onCreateCommand": "curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash && sudo apt install -y libmariadb3 libmariadb-dev",
   "updateContentCommand": "pip install -r backend/requirements.txt",
   "portsAttributes": {
     "5000": {
