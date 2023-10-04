@@ -11,7 +11,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Auf Liste setzen</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Auf die Liste setzen</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -20,7 +20,7 @@
                 <div class="row">
                     <div class="col">
                         <h5 id="songTitle"></h5>
-                        <p id="songArtist"></p>
+                        <p><span id="songArtist"></span>&nbsp;<span id="songYear"></span></p>
                     </div>
                 </div>
                 <div class="row">
@@ -101,12 +101,17 @@
     }
 
     function setSelectedId(id) {
+        $("#songArtist").html("");
+        $("#songTitle").html("");
+        $("#songYear").html("");
+        $("#indicators")[0].innerHTML = "";
+
         $("#selectedId").attr("value", id);
         $.getJSON("/api/songs/details/" + id, function (data) {
             console.log(data);
             $("#songTitle").html(data["title"]);
             $("#songArtist").html(data["artist"]);
-
+            $("#songYear").html(data["year"]);
             $("#indicators")[0].innerHTML = "";
 
             let duoindicator_badge = document.createElement("span");
