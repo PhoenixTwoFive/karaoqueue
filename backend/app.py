@@ -170,6 +170,22 @@ def query_songs_with_details(input_string=""):
     return jsonify(result)
 
 
+@app.route("/api/songs/suggest")
+@nocache
+def query_songs_with_details_suggest(input_string=""):
+    input_string = request.args.get("count", input_string)
+    if input_string == "":
+        return Response(status=400)
+    result = []
+    if not input_string.isnumeric():
+        return Response(status=400)
+    count: int = int(input_string)
+    for x in database.get_song_suggestions(count):
+        # Turn row into dict. Add field labels.
+        result.append(dict(zip(['karafun_id', 'title', 'artist', 'year', 'duo', 'explicit', 'styles', 'languages'], x)))
+    return jsonify(result)
+
+
 @app.route("/api/songs/details/<song_id>")
 def get_song_details(song_id):
     result = database.get_song_details(song_id)
@@ -261,14 +277,20 @@ def get_accept_entries():
     return Response('{"status": "OK", "value": ' + str(int(accept_entries)) + '}', mimetype='text/json')
 
 
-@app.route("/api/played/clear")
+@app.route("/api/event/close")
 @nocache
 @basic_auth.required
-def clear_played_songs():
-    if database.clear_played_songs():
+def close_event():
+    try:
+        database.transfer_playbacks()
+        database.clear_played_songs()
+        database.delete_all_entries()
+        helpers.reset_current_event_id(app)
         return Response('{"status": "OK"}', mimetype='text/json')
-    else:
-        return Response('{"status": "FAIL"}', mimetype='text/json')
+    except Exception as e:
+        response = jsonify({"status": "FAIL", "exception": e})
+        response.status_code = 400
+        return response
 
 
 @app.route("/api/entries/delete_all")
@@ -298,6 +320,7 @@ def activate_job():
     with app.app_context():
         helpers.load_dbconfig(app)
         helpers.load_version(app)
+        database.create_schema()
         database.create_entry_table()
         database.create_song_table()
         database.create_done_song_table()
