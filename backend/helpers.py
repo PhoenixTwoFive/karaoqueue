@@ -39,7 +39,7 @@ def load_version(app: Flask):
         app.config['VERSION'] = subprocess.Popen("echo \"$(git rev-parse --abbrev-ref HEAD)-$(git describe)\"", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8').strip() + " (debug)"  # noqa: E501 # type: ignore
         return
     if os.environ.get("SOURCE_VERSION"):
-        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")[0:7]  # type: ignore # noqa: E501
+        app.config['VERSION'] = os.environ.get("SOURCE_VERSION")  # type: ignore # noqa: E501
         return
     else:
         app.config['VERSION'] = "Unknown"
