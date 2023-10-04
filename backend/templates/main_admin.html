@@ -27,8 +27,8 @@
             <tr>
                 <th data-field="state" data-checkbox="true"></th>
                 <th scope="col" data-field="Name" data-formatter="CopyFormatter">Name</th>
-                <th scope="col" data-field="Title"data-formatter="CopyFormatter">Song</th>
-                <th scope="col" data-field="Artist"data-formatter="CopyFormatter">Künstler</th>
+                <th scope="col" data-field="Title" data-formatter="CopyFormatter">Song</th>
+                <th scope="col" data-field="Artist" data-formatter="CopyFormatter">Künstler</th>
                 <th scope="col" data-formatter="TableActions">Aktionen</th>
             </tr>
         </thead>
@@ -195,8 +195,8 @@
     }
 
     function CopyFormatter(value, row, index) {
-        let escapedString = value.replace("\"","\\\"").replace("\'", "\\\'")
-        return "<span onclick='copyAndNotify(this.innerText)'>"+value+"</span>";
+        let escapedString = value.replace("\"", "\\\"").replace("\'", "\\\'")
+        return "<span onclick='copyAndNotify(this.innerText)'>" + value + "</span>";
     }
 
     function getIdSelections() {
@@ -212,9 +212,9 @@
                 message: text,
                 status: 1,
                 timeout: 5000
-              };
+            };
             Toast.create(toast);
-            })
+        })
     }
 </script>
 {% endblock %}
