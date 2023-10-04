@@ -1,5 +1,3 @@
-
-
 {% extends 'base.html' %}
 {% block title %}Warteliste{% endblock %}
 {% block content %}
@@ -9,7 +7,7 @@
         data-url="/api/queue"
         data-pagination="true"
         data-classes="table"
-        data-show-refresh="false"
+    data-show-refresh="false"
         data-auto-refresh="true"
         data-auto-refresh-interval="10">
     <thead>
@@ -25,53 +23,53 @@
 {% endblock %}
 {% block extrajs %}
 <script>
-$.getJSON("/api/entries/accept", (data) => {
-    if (data["value"]==0) {
-        $("#bfb").addClass("disabled")
-        $("#bfb").prop("aria-disabled",true);
-        $("#bfb").prop("tabindex","-1");
-        $("#bfb").wrap("<span class='tooltip-span' tabindex='0' data-toggle='tooltip' data-placement='bottom'></span>");
-                $(".tooltip-span").prop("title", "Eintragungen sind leider momentan nicht möglich.")
-                $('[data-toggle="tooltip"]').tooltip()
-    }
-})
-
-function TableActionsFormatter(value,row,index) {
-    console.log("Value: " + value + ", Row: " + row + ", Index: " + index)
-    console.log(row)
-    if (getOwnedEntries().includes(row.entry_ID)) {
-      return "<button type='button' class='btn btn-danger' data-toggle='tooltip' data-placement='top' title='Eintrag zurückziehen' onclick=\"event.stopPropagation();$(this).tooltip('dispose');requestDeletionAsUser("+row["entry_ID"]+")\"><i class='fas fa-trash'></i></button>"
-    }
-    return ""
-}
-
-function requestDeletionAsUser(id) {
-  bootbox.confirm("Wirklich den Eintrag zurückziehen? Das könnte zu einer langen Wartezeit führen!", function (result) {
-    if (result) {
-        payload = {
-            "client_id": localStorage.getItem("clientId"),
-            "entry_id": id
+    $.getJSON("/api/entries/accept", (data) => {
+        if (data["value"] == 0) {
+            $("#bfb").addClass("disabled")
+            $("#bfb").prop("aria-disabled", true);
+            $("#bfb").prop("tabindex", "-1");
+            $("#bfb").wrap("<span class='tooltip-span' tabindex='0' data-toggle='tooltip' data-placement='bottom'></span>");
+            $(".tooltip-span").prop("title", "Eintragungen sind leider momentan nicht möglich.")
+            $('[data-toggle="tooltip"]').tooltip()
         }
-        $.ajax({
-            url: "/api/entries/delete/"+id,
-            type: "POST",
-            data: JSON.stringify(payload),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function(result) {
-                toast = {
-                  title: "Erfolgreich zurückgezogen",
-                  message: "Eintrag wurde gelöscht",
-                  status: TOAST_STATUS.SUCCESS,
-                  timeout: 5000
+    })
+
+    function TableActionsFormatter(value, row, index) {
+        console.log("Value: " + value + ", Row: " + row + ", Index: " + index)
+        console.log(row)
+        if (getOwnedEntries().includes(row.entry_ID)) {
+            return "<button type='button' class='btn btn-danger' data-toggle='tooltip' data-placement='top' title='Eintrag zurückziehen' onclick=\"event.stopPropagation();$(this).tooltip('dispose');requestDeletionAsUser(" + row["entry_ID"] + ")\"><i class='fas fa-trash'></i></button>"
+        }
+        return ""
+    }
+
+    function requestDeletionAsUser(id) {
+        bootbox.confirm("Wirklich den Eintrag zurückziehen? Das könnte zu einer langen Wartezeit führen!", function (result) {
+            if (result) {
+                payload = {
+                    "client_id": localStorage.getItem("clientId"),
+                    "entry_id": id
                 }
-                Toast.create(toast);
-                location.reload()
+                $.ajax({
+                    url: "/api/entries/delete/" + id,
+                    type: "POST",
+                    data: JSON.stringify(payload),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        toast = {
+                            title: "Erfolgreich zurückgezogen",
+                            message: "Eintrag wurde gelöscht",
+                            status: TOAST_STATUS.SUCCESS,
+                            timeout: 5000
+                        }
+                        Toast.create(toast);
+                        location.reload()
+                    }
+                })
             }
         })
     }
-  })
-}
 
 </script>
 {% endblock %}
