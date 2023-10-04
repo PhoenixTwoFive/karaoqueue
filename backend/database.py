@@ -28,6 +28,11 @@ def import_songs(song_csv):
     with get_db_engine().connect() as conn:
         df.to_sql(song_table, conn, if_exists='replace',
                   index=False)
+        try:
+            cur = conn.execute(text("ALTER TABLE songs ADD FULLTEXT(Title,Artist)"))
+            conn.commit()
+        except Exception:
+            pass   
         cur = conn.execute(text("SELECT Count(Id) FROM songs"))
         num_songs = cur.fetchone()[0]  # type: ignore
         conn.commit()
