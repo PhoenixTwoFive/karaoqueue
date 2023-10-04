@@ -69,67 +69,7 @@
 <script>
     $(document).ready(function () {
         $("#filter").focus();
-        $("#filter").keyup(function () {
-            var value = $(this).val().toLowerCase();
-            //alert(value);
-            if (value.length >= 1) {
-                $.getJSON("/api/songs/search", { q: value }, function (data) {
-                    var items = [];
-                    $("#songtable").html("")
-                    $.each(data, function (key, val) {
-                        let itemRow = document.createElement("tr")
-                        let itemCell = document.createElement("td")
-                        itemCell.innerHTML = val["artist"] + ` - ` + val["title"]
-                        itemRow.appendChild(itemCell)
-                        let infoCell = document.createElement("td")
-                        let duoindicator = document.createElement("i")
-                        duoindicator.classList.add("fas")
-                        if (val["duo"] == 0) {
-                            duoindicator.classList.add("fa-user")
-                            
-                        }
-                        if (val["duo"] == 1) {
-                            duoindicator.classList.add("fa-user-friends")
-                        }
-                        duoindicator.classList.add("ml-1")
-                        duoindicator.classList.add("list-indicator")
-                        infoCell.appendChild(duoindicator)
-                        if (val["explicit"] == 1) {
-                            let explicitindicator = document.createElement("i")
-                            explicitindicator.classList.add("fas")
-                            explicitindicator.classList.add("fa-e")
-                            explicitindicator.classList.add("ml-1")
-                            infoCell.appendChild(explicitindicator)
-                        }
-                        itemRow.appendChild(infoCell)
-                        let buttonCell = document.createElement("td")
-                        let button = document.createElement("button")
-                        button.classList.add("btn")
-                        button.classList.add("btn-primary")
-                        button.classList.add("justify-content-center")
-                        button.classList.add("align-content-between")
-                        button.classList.add("enqueueButton")
-                        button.setAttribute("type", "button")
-                        button.setAttribute("data-toggle", "modal")
-                        button.setAttribute("data-target", "#enqueueModal")
-                        button.setAttribute("onclick", "setSelectedId(" + val["karafun_id"] + ")")
-                        let buttonIcon = document.createElement("i")
-                        buttonIcon.classList.add("fas")
-                        buttonIcon.classList.add("fa-plus")
-                        button.appendChild(buttonIcon)
-                        buttonCell.appendChild(button)
-                        itemRow.appendChild(buttonCell)
-                        $("#songtable").append(itemRow)
-                    });
-
-                    
-                    $(items.join("")).appendTo("#songtable");
-                    entriesAccepted()
-                });
-            } else {
-                $("#songtable").html("")
-            }
-        });
+        $("#filter").keyup(debounce(() => songSearch()));
 
         $("#nameForm").submit(function (e) {
             e.preventDefault();
@@ -270,6 +210,76 @@
 
 
     }
+
+    function songSearch() {
+        let value = $("#filter").val()
+        if (value.length >= 1) {
+            $.getJSON("/api/songs/search", { q: value }, function (data) {
+                var items = [];
+                $("#songtable").html("")
+                $.each(data, function (key, val) {
+                    let itemRow = document.createElement("tr")
+                    let itemCell = document.createElement("td")
+                    itemCell.innerHTML = val["artist"] + ` - ` + val["title"]
+                    itemRow.appendChild(itemCell)
+                    let infoCell = document.createElement("td")
+                    let duoindicator = document.createElement("i")
+                    duoindicator.classList.add("fas")
+                    if (val["duo"] == 0) {
+                        duoindicator.classList.add("fa-user")
+
+                    }
+                    if (val["duo"] == 1) {
+                        duoindicator.classList.add("fa-user-friends")
+                    }
+                    duoindicator.classList.add("ml-1")
+                    duoindicator.classList.add("list-indicator")
+                    infoCell.appendChild(duoindicator)
+                    if (val["explicit"] == 1) {
+                        let explicitindicator = document.createElement("i")
+                        explicitindicator.classList.add("fas")
+                        explicitindicator.classList.add("fa-e")
+                        explicitindicator.classList.add("ml-1")
+                        infoCell.appendChild(explicitindicator)
+                    }
+                    itemRow.appendChild(infoCell)
+                    let buttonCell = document.createElement("td")
+                    let button = document.createElement("button")
+                    button.classList.add("btn")
+                    button.classList.add("btn-primary")
+                    button.classList.add("justify-content-center")
+                    button.classList.add("align-content-between")
+                    button.classList.add("enqueueButton")
+                    button.setAttribute("type", "button")
+                    button.setAttribute("data-toggle", "modal")
+                    button.setAttribute("data-target", "#enqueueModal")
+                    button.setAttribute("onclick", "setSelectedId(" + val["karafun_id"] + ")")
+                    let buttonIcon = document.createElement("i")
+                    buttonIcon.classList.add("fas")
+                    buttonIcon.classList.add("fa-plus")
+                    button.appendChild(buttonIcon)
+                    buttonCell.appendChild(button)
+                    itemRow.appendChild(buttonCell)
+                    $("#songtable").append(itemRow)
+                });
+
+
+                $(items.join("")).appendTo("#songtable");
+                entriesAccepted()
+            });
+        } else {
+            $("#songtable").html("")
+        }
+    }
+
+    function debounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+
 
     {% if not auth %}
     function entriesAccepted() {
