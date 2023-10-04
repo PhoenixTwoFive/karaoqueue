@@ -7,9 +7,6 @@
   "onCreateCommand": "curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash && sudo apt install -y libmariadb3 libmariadb-dev",
   "updateContentCommand": "pip install -r backend/requirements.txt",
   "postCreateCommand": "",
-  "postAttachCommand": {
-    "server": "flask --debug run"
-  },
   "portsAttributes": {
     "5000": {
       "label": "Application",
