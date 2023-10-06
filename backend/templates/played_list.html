@@ -2,8 +2,8 @@
 {% block title %}Abspielliste{% endblock %}
 {% block content %}
 <div id="toolbar">
-    <button type="button" class="topbutton btn btn-danger" onclick="confirmDeleteAllEntries()"><i
-            class="fas fa-trash mr-2"></i>Abspielliste löschen</button>
+    <button type="button" class="topbutton btn btn-danger" onclick="confirmCloseEvent()"><i
+            class="fas fa-trash mr-2"></i>Event beenden</button>
     <button type="button" class="topbutton btn btn-primary" onclick="exportPDF()"><i
             class="fas fa-file-pdf mr-2"></i>Als PDF herunterladen</button>
     <button type="button" class="topbutton btn btn-secondary" onclick="printPDF()"><i
@@ -41,9 +41,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
 <script src="https://unpkg.com/jspdf-autotable@3.0.10/dist/jspdf.plugin.autotable.js"></script>
 <script>
-    function confirmDeleteAllEntries() {
+    function confirmCloseEvent() {
         bootbox.confirm({
-            message: "Wirklich Abspielliste löschen?<br>Stelle sicher, dass du sie vorher zwecks Abrechnung gedruckt und/oder heruntergeladen hast!", 
+            message: `Wirklich Ereignis beenden?<br>
+                        Folgendes wird passieren:<br>
+                        <ul>
+                            <li>Die Warteschlange wird geleert</li>
+                            <li>Die Abspielliste wird gelöscht</li>
+                            <li>Eine neue Event-ID wird vergeben</li>
+                        </ul>
+                        Diese Aktion kann nicht rückgängig gemacht werden!
+            `, 
             buttons: {
                 confirm: {
                     label: 'Ja',
@@ -56,15 +64,15 @@
             },
             callback: function(result){
                 if (result) {
-                    deleteAllEntries()
+                    closeEvent()
                 }
             }
         })
     }
-    function deleteAllEntries() {
+    function closeEvent() {
         $.ajax({
             type: 'GET',
-            url: '/api/played/clear',
+            url: '/api/event/close',
             contentType: "application/json",
             dataType: 'json',
             async: false

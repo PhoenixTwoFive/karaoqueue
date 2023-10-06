@@ -7,6 +7,7 @@ import os
 import json
 from flask_basicauth import BasicAuth
 from helpers import nocache
+from werkzeug.utils import secure_filename
 app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
@@ -170,6 +171,70 @@ def query_songs_with_details(input_string=""):
     return jsonify(result)
 
 
+@app.route("/api/songs/suggest")
+@nocache
+def query_songs_with_details_suggest(input_string=""):
+    input_string = request.args.get("count", input_string)
+    if input_string == "":
+        return Response(status=400)
+    result = []
+    if not input_string.isnumeric():
+        return Response(status=400)
+    count: int = int(input_string)
+    for x in database.get_song_suggestions(count):
+        # Turn row into dict. Add field labels.
+        result.append(dict(zip(['karafun_id', 'title', 'artist', 'year', 'duo', 'explicit', 'styles', 'languages'], x)))
+    return jsonify(result)
+
+
+@app.route("/api/songs/stats")
+@nocache
+# Return the data from long_term_stats as json
+def get_stats():
+    db_result = database.get_long_term_stats()
+    data = []
+    for row in db_result:
+        data.append(dict(zip(['id', 'count'], row)))
+    return jsonify(data)
+
+
+@app.route("/api/songs/stats.csv")
+@nocache
+# Return data from long_term_stats as csv
+def get_stats_csv():
+    db_result = database.get_long_term_stats()
+    print(db_result)
+    csv = "Id,Playbacks\n"
+    for row in db_result:
+        csv += str(row[0]) + "," + str(row[1]) + "\n"
+    return Response(csv, mimetype='text/csv')
+
+
+@app.route("/api/songs/stats.csv", methods=['POST'])
+@nocache
+@basic_auth.required
+# Update long_term_stats from csv
+def update_stats_csv():
+    if not request.files:
+        abort(400)
+    file = request.files['file']
+    if file.filename is None:
+        abort(400)
+    else:
+        filename = secure_filename(file.filename)
+    if filename == '':
+        abort(400)
+    if not filename.endswith('.csv'):
+        abort(400)
+    if file:
+        if database.import_stats(file):
+            return Response('{"status": "OK"}', mimetype='text/json')
+        else:
+            return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
+    else:
+        abort(400)
+
+
 @app.route("/api/songs/details/<song_id>")
 def get_song_details(song_id):
     result = database.get_song_details(song_id)
@@ -261,14 +326,20 @@ def get_accept_entries():
     return Response('{"status": "OK", "value": ' + str(int(accept_entries)) + '}', mimetype='text/json')
 
 
-@app.route("/api/played/clear")
+@app.route("/api/event/close")
 @nocache
 @basic_auth.required
-def clear_played_songs():
-    if database.clear_played_songs():
+def close_event():
+    try:
+        database.transfer_playbacks()
+        database.clear_played_songs()
+        database.delete_all_entries()
+        helpers.reset_current_event_id(app)
         return Response('{"status": "OK"}', mimetype='text/json')
-    else:
-        return Response('{"status": "FAIL"}', mimetype='text/json')
+    except Exception:
+        response = jsonify({"status": "FAIL", "message": "An error occured while closing the event."})
+        response.status_code = 400
+        return response
 
 
 @app.route("/api/entries/delete_all")
@@ -298,6 +369,7 @@ def activate_job():
     with app.app_context():
         helpers.load_dbconfig(app)
         helpers.load_version(app)
+        database.create_schema()
         database.create_entry_table()
         database.create_song_table()
         database.create_done_song_table()

@@ -40,6 +40,31 @@ def import_songs(song_csv):
     return ("Imported songs ({} in Database)".format(num_songs))
 
 
+def import_stats(stats_csv):
+    print("Start importing Stats...")
+    df = pandas.read_csv(stats_csv, sep=',')
+    if (df.columns[0] != "Id" or df.columns[1] != "Playbacks"):
+        return False
+    with get_db_engine().connect() as conn:
+        for index, row in df.iterrows():
+            stmt = text(
+                "INSERT INTO long_term_stats (Id,Playbacks) VALUES (:par_id,:par_playbacks) ON DUPLICATE KEY UPDATE Playbacks=:par_playbacks")
+            conn.execute(stmt, {"par_id": row["Id"], "par_playbacks": row["Playbacks"]})
+        conn.commit()
+    return True
+
+
+def create_schema():
+    create_song_table()
+    create_entry_table()
+    create_done_song_table()
+    create_config_table()
+    create_long_term_stats_table()
+    create_list_view()
+    create_done_song_view()
+    init_event_id()
+
+
 def create_entry_table():
     with get_db_engine().connect() as conn:
         stmt = text(
@@ -70,6 +95,17 @@ def create_song_table():
         `Languages` TEXT,
         PRIMARY KEY (`Id`),
         FULLTEXT KEY (`Title`,`Artist`)
+        )""")
+        conn.execute(stmt)
+        conn.commit()
+
+
+def create_long_term_stats_table():
+    with get_db_engine().connect() as conn:
+        stmt = text("""CREATE TABLE IF NOT EXISTS `long_term_stats` (
+        `Id` INTEGER,
+        `Playbacks` INTEGER,
+        PRIMARY KEY (`Id`)
         )""")
         conn.execute(stmt)
         conn.commit()
@@ -117,6 +153,34 @@ def get_list():
 def get_played_list():
     with get_db_engine().connect() as conn:
         stmt = text("SELECT * FROM Abspielliste")
+        cur = conn.execute(stmt)
+    return cur.fetchall()
+
+
+def get_song_suggestions(count: int):
+    with get_db_engine().connect() as conn:
+        # Get the top 10 songs with the most plays from the long_term_stats table and join them with the songs table to get the song details.
+        # Exclude songs that are already in the queue, or in the done_songs table.
+        stmt = text("""
+                    SELECT s.Id, s.Title, s.Artist, s.Year, s.Duo, s.Explicit, s.Styles, s.Languages
+                    FROM long_term_stats lts
+                    LEFT JOIN songs s ON lts.Id = s.Id
+                    LEFT JOIN entries e ON lts.Id = e.Song_Id
+                    LEFT JOIN done_songs ds ON lts.Id = ds.Song_Id
+                    WHERE e.Id IS NULL AND ds.Song_Id IS NULL
+                    ORDER BY lts.Playbacks DESC
+                    LIMIT :count;
+                    """)
+        cur = conn.execute(stmt, {"count": count})
+    return cur.fetchall()
+
+
+def get_long_term_stats():
+    with get_db_engine().connect() as conn:
+        stmt = text("""
+                    SELECT lts.Id, lts.Playbacks
+                    FROM long_term_stats lts
+                    """)
         cur = conn.execute(stmt)
     return cur.fetchall()
 
@@ -222,6 +286,23 @@ def check_queue_length():
     with get_db_engine().connect() as conn:
         cur = conn.execute(text("SELECT Count(*) FROM entries"))
     return cur.fetchall()[0][0]
+
+
+def transfer_playbacks():
+    with get_db_engine().connect() as conn:
+        # Use SQL to update the long_term_stats table. Add the playbacks of the songs in the done_songs table to the playbacks of the songs in the long_term_stats table.
+        stmt = text("""
+                    INSERT INTO long_term_stats(Id, Playbacks)
+                    SELECT ds.Song_Id, ds.Plays
+                    FROM done_songs ds
+                    LEFT JOIN long_term_stats lts ON ds.Song_Id = lts.Id
+                    ON DUPLICATE KEY
+                    UPDATE Playbacks = lts.Playbacks + VALUES(Playbacks);
+                    """)
+        result = conn.execute(stmt)
+        print(result)
+        conn.commit()
+    return True
 
 
 def clear_played_songs():

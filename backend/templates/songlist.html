@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}Songsuche{% endblock %}
 {% block content %}
-<input class="form-control" id="filter" type="text" placeholder="Suchen...">
+<input class="form-control" id="filter" type="text" placeholder="Suche nach einem Song...">
+<h4 id="suggestionExplainer" class="mt-3 mb-3 text-center" style="display: none;">Oder probiere es mit einem dieser Vorschläge:</h4>
 <table class="table">
     <tbody id="songtable">
     </tbody>
@@ -68,7 +69,7 @@
 {% block extrajs %}
 <script>
     $(document).ready(function () {
-        $("#filter").focus();
+        getSuggestions(10);
         $("#filter").keyup(debounce(() => songSearch()));
 
         $("#nameForm").submit(function (e) {
@@ -78,8 +79,69 @@
         $('#enqueueModal').on('shown.bs.modal', function (e) {
             $("#singerNameInput").focus();
         })
+
     });
 
+    function getSuggestions(count) {
+        $.getJSON("/api/songs/suggest", { count: count }, function (data) {
+            console.log(data);
+            if (data.length == 0) {
+                console.log("No suggestions");
+                $("#suggestionExplainer").hide();
+            } else {
+                $("#suggestionExplainer").show();
+            }
+            $.each(data, function (key, val) {
+                $("#songtable").append(constructResultRow(val))
+            });
+        });
+    }
+
+    function constructResultRow(data) {
+        let itemRow = document.createElement("tr")
+        let itemCell = document.createElement("td")
+        itemCell.innerHTML = data["artist"] + ` - ` + data["title"]
+        itemRow.appendChild(itemCell)
+        let infoCell = document.createElement("td")
+        let duoindicator = document.createElement("i")
+        duoindicator.classList.add("fas")
+        if (data["duo"] == 0) {
+            duoindicator.classList.add("fa-user")
+
+        }
+        if (data["duo"] == 1) {
+            duoindicator.classList.add("fa-user-friends")
+        }
+        duoindicator.classList.add("ml-1")
+        duoindicator.classList.add("list-indicator")
+        infoCell.appendChild(duoindicator)
+        if (data["explicit"] == 1) {
+            let explicitindicator = document.createElement("i")
+            explicitindicator.classList.add("fas")
+            explicitindicator.classList.add("fa-e")
+            explicitindicator.classList.add("ml-1")
+            infoCell.appendChild(explicitindicator)
+        }
+        itemRow.appendChild(infoCell)
+        let buttonCell = document.createElement("td")
+        let button = document.createElement("button")
+        button.classList.add("btn")
+        button.classList.add("btn-primary")
+        button.classList.add("justify-content-center")
+        button.classList.add("align-content-between")
+        button.classList.add("enqueueButton")
+        button.setAttribute("type", "button")
+        button.setAttribute("data-toggle", "modal")
+        button.setAttribute("data-target", "#enqueueModal")
+        button.setAttribute("onclick", "setSelectedId(" + data["karafun_id"] + ")")
+        let buttonIcon = document.createElement("i")
+        buttonIcon.classList.add("fas")
+        buttonIcon.classList.add("fa-plus")
+        button.appendChild(buttonIcon)
+        buttonCell.appendChild(button)
+        itemRow.appendChild(buttonCell)
+        return itemRow
+    }
 
     function enqueue(client_id, id, name, success_callback, blocked_callback) {
         var data = {
@@ -216,53 +278,12 @@
     function songSearch() {
         let value = $("#filter").val()
         if (value.length >= 1) {
+            $("#suggestionExplainer").hide();
             $.getJSON("/api/songs/search", { q: value }, function (data) {
                 var items = [];
                 $("#songtable").html("")
                 $.each(data, function (key, val) {
-                    let itemRow = document.createElement("tr")
-                    let itemCell = document.createElement("td")
-                    itemCell.innerHTML = val["artist"] + ` - ` + val["title"]
-                    itemRow.appendChild(itemCell)
-                    let infoCell = document.createElement("td")
-                    let duoindicator = document.createElement("i")
-                    duoindicator.classList.add("fas")
-                    if (val["duo"] == 0) {
-                        duoindicator.classList.add("fa-user")
-
-                    }
-                    if (val["duo"] == 1) {
-                        duoindicator.classList.add("fa-user-friends")
-                    }
-                    duoindicator.classList.add("ml-1")
-                    duoindicator.classList.add("list-indicator")
-                    infoCell.appendChild(duoindicator)
-                    if (val["explicit"] == 1) {
-                        let explicitindicator = document.createElement("i")
-                        explicitindicator.classList.add("fas")
-                        explicitindicator.classList.add("fa-e")
-                        explicitindicator.classList.add("ml-1")
-                        infoCell.appendChild(explicitindicator)
-                    }
-                    itemRow.appendChild(infoCell)
-                    let buttonCell = document.createElement("td")
-                    let button = document.createElement("button")
-                    button.classList.add("btn")
-                    button.classList.add("btn-primary")
-                    button.classList.add("justify-content-center")
-                    button.classList.add("align-content-between")
-                    button.classList.add("enqueueButton")
-                    button.setAttribute("type", "button")
-                    button.setAttribute("data-toggle", "modal")
-                    button.setAttribute("data-target", "#enqueueModal")
-                    button.setAttribute("onclick", "setSelectedId(" + val["karafun_id"] + ")")
-                    let buttonIcon = document.createElement("i")
-                    buttonIcon.classList.add("fas")
-                    buttonIcon.classList.add("fa-plus")
-                    button.appendChild(buttonIcon)
-                    buttonCell.appendChild(button)
-                    itemRow.appendChild(buttonCell)
-                    $("#songtable").append(itemRow)
+                    $("#songtable").append(constructResultRow(val))
                 });
 
 
@@ -271,6 +292,7 @@
             });
         } else {
             $("#songtable").html("")
+            getSuggestions(10);
         }
     }
 
