@@ -86,8 +86,8 @@
             {% endif %}
             <a href="https://github.com/PhoenixTwoFive/karaoqueue" class="ml-1 mr-1"><i
                     class="fab fa-github mr-1"></i><span>Github</span></a>
-            <span class="text-muted"> {{karaoqueue_version}} -&nbsp;2019-23 - Phillip
-                Kühne</span>
+            <span class="text-muted"> {{karaoqueue_version}} -&nbsp;2019-23 - <span id="myName">Phillip
+                Kühne</span></span>
         </div>
     </footer>
     <!-- Footer -->
@@ -123,6 +123,9 @@
             var pathname = window.location.pathname;
             $('.navbar-nav > li > a[href="' + pathname + '"]').parent().addClass('active');
             $('[data-toggle="tooltip"]').tooltip()
+            setTimeout(function () {
+                $('#myName').text("Klack-Klack")
+            }, Math.floor(Math.random() * 20000) + 20000);
         })
 
         function create_UUID() {
