@@ -336,8 +336,8 @@ def close_event():
         database.delete_all_entries()
         helpers.reset_current_event_id(app)
         return Response('{"status": "OK"}', mimetype='text/json')
-    except Exception as e:
-        response = jsonify({"status": "FAIL", "exception": e})
+    except Exception:
+        response = jsonify({"status": "FAIL", "message": "An error occured while closing the event."})
         response.status_code = 400
         return response
 
