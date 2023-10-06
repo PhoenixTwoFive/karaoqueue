@@ -4,7 +4,8 @@
 <form method="post">
     <p>
         <label for="entryquota">Maximale Anzahl an Einträgen pro Nutzer</label>
-        <input type="number" class="form-control" id="entryquota" name="entryquota" min=1 value={{app.config['ENTRY_QUOTA']}}>
+        <input type="number" class="form-control" id="entryquota" name="entryquota" min=1
+            value={{app.config['ENTRY_QUOTA']}}>
     </p>
     <p>
         <label for="maxqueue">Maximale Anzahl an Einträgen Insgesamt</label>
@@ -14,7 +15,7 @@
         <label for="theme">Aktives Theme</label>
         <select class="form-control" id="theme" name="theme">
             {% for theme in themes %}
-            <option value="{{theme}}" {% if theme == config['THEME'] %}selected{% endif %}>{{theme}}</option>
+            <option value="{{theme}}" {% if theme==config['THEME'] %}selected{% endif %}>{{theme}}</option>
             {% endfor %}
         </select>
     </p>
@@ -24,7 +25,8 @@
     </div>
     <p>
         <label for="username">Benutzername</label>
-        <input type="text" class="form-control" id="username" name="username" value={{app.config['BASIC_AUTH_USERNAME']}}>
+        <input type="text" class="form-control" id="username" name="username"
+            value={{app.config['BASIC_AUTH_USERNAME']}}>
     </p>
     <p>
         <label for="password">Passwort ändern</label>
@@ -32,10 +34,69 @@
     </p>
     <input type="submit" class="btn btn-primary mr-1 mb-2" value="Einstellungen anwenden">
 </form>
+<form>
+    <p>
+        <label for="statsImport">Statistiken importieren/exportieren</label>
+    </p>
+    <div class="row">
+        <div class="col-sm-4">
+            <a class="btn btn-secondary" type="button" id="statsExport" href="/api/songs/stats.csv"><i class="fas fa-download mr-1"></i>Exportieren</a>
+        </div>
+        <div class="col input-group mb-3">
+            <div class="custom-file mr-1">
+                <input type="file" class="custom-file-input" id="statsImport" data-allowed-file-extensions='["csv"]'>
+                <label class="custom-file-label" for="statsImport">CSV-Datei auswählen</label>
+            </div>
+            <button class="btn btn-secondary" type="button" id="statsImportBtn"><i class="fas fa-upload mr-1"></i>Importieren</button>
+        </div>
+    </div>
+    
+    <p>
+    </p>
+</form>
 <details>
     <summary>Current config:</summary>
     <pre>{% for key, val in config.items() %}{{key}}: {{val}}<br>{% endfor %}</pre>
 </details>
 {% endblock %}
 {% block extrajs %}
+<script>
+    $(document).ready(function () {
+        $('#statsImport').on('change', function () {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').html(fileName);
+        });
+        $('#statsImportBtn').on('click', function () {
+            var file_data = $('#statsImport').prop('files')[0];
+            var form_data = new FormData();
+            form_data.append('file', file_data);
+            $.ajax({
+                url: '/api/songs/stats.csv',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    toast = {
+                        title: "Erfolgreich importiert",
+                        message: "Die Statistiken wurden erfolgreich importiert.",
+                        status: TOAST_STATUS.SUCCESS,
+                        timeout: 5000
+                    }
+                    Toast.create(toast);
+                },
+                error: function (response) {
+                    toast = {
+                        title: "Fehler beim Importieren",
+                        message: "Die Statistiken konnten nicht importiert werden.",
+                        status: TOAST_STATUS.ERROR,
+                        timeout: 5000
+                    }
+                    Toast.create(toast);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

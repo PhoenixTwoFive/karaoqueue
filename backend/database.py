@@ -40,6 +40,20 @@ def import_songs(song_csv):
     return ("Imported songs ({} in Database)".format(num_songs))
 
 
+def import_stats(stats_csv):
+    print("Start importing Stats...")
+    df = pandas.read_csv(stats_csv, sep=',')
+    if (df.columns[0] != "Id" or df.columns[1] != "Playbacks"):
+        return False
+    with get_db_engine().connect() as conn:
+        for index, row in df.iterrows():
+            stmt = text(
+                "INSERT INTO long_term_stats (Id,Playbacks) VALUES (:par_id,:par_playbacks) ON DUPLICATE KEY UPDATE Playbacks=:par_playbacks")
+            conn.execute(stmt, {"par_id": row["Id"], "par_playbacks": row["Playbacks"]})
+        conn.commit()
+    return True
+
+
 def create_schema():
     create_song_table()
     create_entry_table()
@@ -158,6 +172,16 @@ def get_song_suggestions(count: int):
                     LIMIT :count;
                     """)
         cur = conn.execute(stmt, {"count": count})
+    return cur.fetchall()
+
+
+def get_long_term_stats():
+    with get_db_engine().connect() as conn:
+        stmt = text("""
+                    SELECT lts.Id, lts.Playbacks
+                    FROM long_term_stats lts
+                    """)
+        cur = conn.execute(stmt)
     return cur.fetchall()
 
 

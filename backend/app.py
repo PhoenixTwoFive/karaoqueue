@@ -7,6 +7,7 @@ import os
 import json
 from flask_basicauth import BasicAuth
 from helpers import nocache
+from werkzeug.utils import secure_filename
 app = Flask(__name__, static_url_path='/static')
 
 basic_auth = BasicAuth(app)
@@ -184,6 +185,54 @@ def query_songs_with_details_suggest(input_string=""):
         # Turn row into dict. Add field labels.
         result.append(dict(zip(['karafun_id', 'title', 'artist', 'year', 'duo', 'explicit', 'styles', 'languages'], x)))
     return jsonify(result)
+
+
+@app.route("/api/songs/stats")
+@nocache
+# Return the data from long_term_stats as json
+def get_stats():
+    db_result = database.get_long_term_stats()
+    data = []
+    for row in db_result:
+        data.append(dict(zip(['id', 'count'], row)))
+    return jsonify(data)
+
+
+@app.route("/api/songs/stats.csv")
+@nocache
+# Return data from long_term_stats as csv
+def get_stats_csv():
+    db_result = database.get_long_term_stats()
+    print(db_result)
+    csv = "Id,Playbacks\n"
+    for row in db_result:
+        csv += str(row[0]) + "," + str(row[1]) + "\n"
+    return Response(csv, mimetype='text/csv')
+
+
+@app.route("/api/songs/stats.csv", methods=['POST'])
+@nocache
+@basic_auth.required
+# Update long_term_stats from csv
+def update_stats_csv():
+    if not request.files:
+        abort(400)
+    file = request.files['file']
+    if file.filename is None:
+        abort(400)
+    else:
+        filename = secure_filename(file.filename)
+    if filename == '':
+        abort(400)
+    if not filename.endswith('.csv'):
+        abort(400)
+    if file:
+        if database.import_stats(file):
+            return Response('{"status": "OK"}', mimetype='text/json')
+        else:
+            return Response('{"status": "FAIL"}', mimetype='text/json', status=400)
+    else:
+        abort(400)
 
 
 @app.route("/api/songs/details/<song_id>")
