@@ -35,8 +35,6 @@
     })
 
     function TableActionsFormatter(value, row, index) {
-        console.log("Value: " + value + ", Row: " + row + ", Index: " + index)
-        console.log(row)
         if (getOwnedEntries().includes(row.entry_ID)) {
             return "<button type='button' class='btn btn-danger' data-toggle='tooltip' data-placement='top' title='Eintrag zurückziehen' onclick=\"event.stopPropagation();$(this).tooltip('dispose');requestDeletionAsUser(" + row["entry_ID"] + ")\"><i class='fas fa-trash'></i></button>"
         }

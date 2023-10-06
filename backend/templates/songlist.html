@@ -108,7 +108,6 @@
 
         $("#selectedId").attr("value", id);
         $.getJSON("/api/songs/details/" + id, function (data) {
-            console.log(data);
             $("#songTitle").html(data["title"]);
             $("#songArtist").html(data["artist"]);
             $("#songYear").html(data["year"]);
@@ -191,7 +190,6 @@
         var name = $("#singerNameInput").val();
         var id = $("#selectedId").attr("value");
         enqueue(localStorage.getItem("clientId"), id, name, function (response) {
-            console.log(response);
             entryID = response["entry_id"];
             toast = {
                 title: "Erfolgreich eingetragen",
@@ -200,7 +198,6 @@
                 timeout: 5000
             }
             Toast.create(toast);
-            console.log("Entry ID: " + entryID);
             addEntry(entryID);
             $("#enqueueModal").modal('hide');
             window.location.href = '/#end';
