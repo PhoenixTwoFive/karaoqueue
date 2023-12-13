@@ -62,7 +62,6 @@ def create_schema():
     create_long_term_stats_table()
     create_list_view()
     create_done_song_view()
-    init_event_id()
 
 
 def create_entry_table():
