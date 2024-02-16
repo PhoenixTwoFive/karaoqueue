@@ -187,6 +187,14 @@
             return entries;
         }
 
+        function dataRequestQueueAndDestroyTooltips(params) {
+          document.querySelectorAll(".tooltip[role='tooltip']").forEach((tooltip) => tooltip.remove());
+          var base_url = "/api/queue"
+          $.get(base_url).then((res) => {
+            params.success(res);
+          });
+        }
+
     </script>
 </body>
 

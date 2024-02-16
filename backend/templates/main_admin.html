@@ -22,7 +22,7 @@
     <table class="table entries" id="entrytable" data-toggle="table" data-search="true" data-show-columns="true"
         data-show-toggle="true" data-multiple-select-row="true" data-click-to-select="true" data-toolbar="#toolbar"
         data-pagination="true" data-show-extended-pagination="true" data-classes="table table-hover"
-        data-url="/api/queue" data-show-refresh="true" data-auto-refresh="true" data-auto-refresh-interval="10">
+        data-ajax="dataRequestQueueAndDestroyTooltips" data-show-refresh="true" data-auto-refresh="true" data-auto-refresh-interval="10">
         <thead>
             <tr>
                 <th data-field="state" data-checkbox="true"></th>
@@ -153,7 +153,7 @@
         $.ajax({
             type: 'POST',
             url: '/api/entries/delete',
-            data: JSON.stringify(ids), // or JSON.stringify ({name: 'jonas'}),
+            data: JSON.stringify(ids),
             error: function () {
                 bootbox.alert({
                     message: "Fehler beim Löschen der Eintragungen.",
