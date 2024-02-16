@@ -299,7 +299,6 @@ def transfer_playbacks():
                     UPDATE Playbacks = lts.Playbacks + VALUES(Playbacks);
                     """)
         result = conn.execute(stmt)
-        print(result)
         conn.commit()
     return True
 

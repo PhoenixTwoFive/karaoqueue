@@ -32,11 +32,9 @@ def favicon():
 @nocache
 def enqueue():
     if not request.json:
-        print(request.data)
         abort(400)
     client_id = request.json['client_id']
     if not helpers.is_valid_uuid(client_id):
-        print(request.data)
         abort(400)
     name = request.json['name'].strip()
     song_id = request.json['id']
@@ -46,11 +44,9 @@ def enqueue():
     else:
         if helpers.get_accept_entries(app):
             if not request.json:
-                print(request.data)
                 abort(400)
             client_id = request.json['client_id']
             if not helpers.is_valid_uuid(client_id):
-                print(request.data)
                 abort(400)
             name = request.json['name']
             song_id = request.json['id']
@@ -203,7 +199,6 @@ def get_stats():
 # Return data from long_term_stats as csv
 def get_stats_csv():
     db_result = database.get_long_term_stats()
-    print(db_result)
     csv = "Id,Playbacks\n"
     for row in db_result:
         csv += str(row[0]) + "," + str(row[1]) + "\n"
@@ -258,14 +253,11 @@ def delete_entry_admin(entry_id):
 @nocache
 def delete_entry_user(entry_id):
     if not request.json:
-        print(request.data)
         abort(400)
     client_id = request.json['client_id']
     if not helpers.is_valid_uuid(client_id):
-        print(request.data)
         abort(400)
     if database.get_raw_entry(entry_id)[3] != client_id:  # type: ignore
-        print(request.data)
         abort(403)
     if database.delete_entry(entry_id):
         return Response('{"status": "OK"}', mimetype='text/json')
@@ -278,7 +270,6 @@ def delete_entry_user(entry_id):
 @basic_auth.required
 def delete_entries():
     if not request.json:
-        print(request.data)
         abort(400)
         return
     updates = database.delete_entries(request.json)
