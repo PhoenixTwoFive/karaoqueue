@@ -298,7 +298,7 @@ def transfer_playbacks():
                     ON DUPLICATE KEY
                     UPDATE Playbacks = lts.Playbacks + VALUES(Playbacks);
                     """)
-        result = conn.execute(stmt)
+        conn.execute(stmt)
         conn.commit()
     return True
 
