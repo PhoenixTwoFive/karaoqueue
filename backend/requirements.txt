@@ -33,7 +33,7 @@ soupsieve==2.5
 SQLAlchemy==2.0.27
 toml==0.10.2
 tomli==2.0.1
-tomlkit==0.12.3
+tomlkit==0.13.2
 typing_extensions==4.9.0
 tzdata==2024.2
 urllib3==2.2.0
