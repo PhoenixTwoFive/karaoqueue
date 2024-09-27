@@ -10,5 +10,8 @@
     "python.testing.unittestEnabled": true,
     "emmet.includeLanguages": {
         "django-html": "html"
+    },
+    "yaml.schemas": {
+        "https://json.schemastore.org/dependabot-2.0.json": "file:///home/phillip/Projekte/Software/StuK/karaoqueue/dependabot.yml"
     }
 }
